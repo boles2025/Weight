@@ -393,9 +393,13 @@
                             </div>
                         </div>
                     </div>
-
-                    <button id="saveDayBtn" class="btn btn-custom btn-lg w-100 shadow-lg animate__animated animate__pulse animate__infinite animate__slow">
+                    
+                    <button id="saveDayBtn" class="btn btn-custom btn-lg w-100 shadow-lg mb-2 animate__animated animate__pulse animate__infinite animate__slow">
                         <i class="fas fa-save me-2"></i> حفظ بيانات اليوم
+                    </button>
+                    
+                    <button id="resetDayBtn" class="btn btn-danger btn-sm w-100 mb-4">
+                        <i class="fas fa-trash-alt me-2"></i> تصفير بيانات اليوم
                     </button>
 
                 </div>
@@ -516,6 +520,7 @@
         const walkingInput = document.getElementById('walkingInput');
         const plankInput = document.getElementById('plankInput');
         const saveDayBtn = document.getElementById('saveDayBtn');
+        const resetDayBtn = document.getElementById('resetDayBtn'); // New Element
         const waterInput = document.getElementById('waterInput');
         
         // Stats Elements
@@ -581,6 +586,7 @@
 
             document.getElementById('addMealBtn').addEventListener('click', addMeal);
             saveDayBtn.addEventListener('click', saveDayData);
+            resetDayBtn.addEventListener('click', resetDayData); // New Event Listener
             document.getElementById('loadMoreHistory').addEventListener('click', loadHistory);
             document.getElementById('exportTodayBtn').addEventListener('click', generateFancyReport);
         }
@@ -749,6 +755,24 @@
                 .catch(e => alert(e.message));
         }
 
+        // New Function: Reset Day Data
+        function resetDayData() {
+            if (!currentUser) return;
+            const date = entryDate.value;
+
+            if (confirm(`هل أنت متأكد من تصفير وحذف جميع بيانات يوم ${date}؟`)) {
+                database.ref('users/' + currentUser.uid + '/days/' + date).remove()
+                    .then(() => {
+                        todayData = {};
+                        resetForm();
+                        alert('تم تصفير وحذف بيانات اليوم بنجاح.');
+                        loadWeightHistory();
+                        loadHistory();
+                    })
+                    .catch(e => alert('فشل التصفير: ' + e.message));
+            }
+        }
+
         // New Feature: Attractive HTML Report
         function generateFancyReport() {
             if (!todayData || Object.keys(todayData).length === 0) {
@@ -793,7 +817,8 @@
                         th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
                         th { background-color: #f2f2f2; }
                         .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
-                        @media print { body { background: white; } .container { border: none; } }
+                        @media print { body { background: white; } .container { border: none; } .print-only { display: block; } .no-print { display: none; } }
+                        .no-print { text-align: center; margin-top: 20px; }
                     </style>
                 </head>
                 <body>
@@ -839,8 +864,12 @@
                             <p>تصميم وتطوير: مهندس بولس سمير</p>
                             <p>تم استخراج هذا التقرير بتاريخ ${new Date().toLocaleString('ar-EG')}</p>
                         </div>
+
+                        <div class="no-print">
+                            <button onclick="window.print()" style="padding: 10px 20px; margin: 5px; background-color: #4facfe; color: white; border: none; border-radius: 5px; cursor: pointer;">طباعة</button>
+                            <button onclick="window.close()" style="padding: 10px 20px; margin: 5px; background-color: #764ba2; color: white; border: none; border-radius: 5px; cursor: pointer;">إغلاق النافذة</button>
+                        </div>
                     </div>
-                    <script>window.print();<\/script>
                 </body>
                 </html>
             `;
