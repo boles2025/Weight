@@ -3,934 +3,1565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق تتبع اللياقة والصحة المتقدم</title>
+    <title>نظام متابعة الصحة | تصميم مهندس بولس سمير</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --accent-color: #e74c3c;
-            --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
-            --warning-color: #f39c12;
-            --info-color: #9b59b6;
-            --water-color: #00a8ff;
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #2d936c;
+            --light-bg: #f8f9fa;
+            --dark-text: #333;
+            --light-text: #fff;
+            --gradient-start: #166088;
+            --gradient-end: #2d936c;
         }
         
         body {
-            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
             padding-top: 20px;
             min-height: 100vh;
-            padding-bottom: 60px; /* مساحة للفوتر */
-            overflow-x: hidden;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
         
-        /* Animations Keyframes */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        @keyframes wave {
-            0% { transform: translateX(0) translateZ(0) scaleY(1) }
-            50% { transform: translateX(-25%) translateZ(0) scaleY(0.55) }
-            100% { transform: translateX(-50%) translateZ(0) scaleY(1) }
-        }
-
-        @keyframes gradient-text {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .animate-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
+        .header {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            color: var(--light-text);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeInDown 1s ease;
         }
         
-        /* Delays for animation sequence */
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-
-        .app-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .header h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .designer-name {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            margin-bottom: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .app-header {
-            background: linear-gradient(135deg, var(--primary-color), #2980b9);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .app-header h1 {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .nav-tabs {
-            border-bottom: none;
-            background-color: #f8f9fa;
-            padding: 10px 15px 0;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-        }
-        
-        .nav-tabs .nav-link {
-            border: none;
-            border-radius: 15px 15px 0 0;
-            margin: 0 5px;
-            color: var(--dark-color);
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            white-space: nowrap;
-        }
-        
-        .nav-tabs .nav-link:hover {
-            background-color: rgba(52, 152, 219, 0.1);
-            transform: translateY(-3px);
-        }
-        
-        .nav-tabs .nav-link.active {
-            background-color: white;
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-            transform: translateY(-5px);
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
-        }
-        
-        .tab-content {
-            padding: 25px;
-            min-height: 500px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 10px;
         }
         
         .card {
             border-radius: 15px;
             border: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: white;
+            overflow: hidden;
         }
         
         .card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
         }
         
         .card-header {
-            background: white;
-            border-bottom: 2px solid #f0f0f0;
-            font-weight: bold;
-            padding: 15px 20px;
-            border-radius: 15px 15px 0 0 !important;
-            color: var(--primary-color);
-        }
-        
-        /* Water Tracker Styles */
-        .water-container {
-            text-align: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        .big-water-cup {
-            width: 150px;
-            height: 200px;
-            border: 4px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 30px 30px;
-            margin: 0 auto 20px;
-            position: relative;
-            overflow: hidden;
-            background: #fff;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-        }
-
-        .water-level {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 0%; /* Dynamic height */
-            background: linear-gradient(to top, #00c6fb 0%, #005bea 100%);
-            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.8;
-        }
-
-        .water-level::before {
-            content: "";
-            position: absolute;
-            top: -10px;
-            left: 0;
-            width: 200%;
-            height: 20px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 50%;
-            animation: wave 2s infinite linear;
-        }
-
-        .water-controls button {
-            transition: transform 0.2s;
-        }
-        .water-controls button:active {
-            transform: scale(0.9);
-        }
-        
-        /* Buttons Styling */
-        .btn {
-            border-radius: 12px;
-            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary { background: linear-gradient(45deg, #2980b9, #3498db); border: none; }
-        .btn-success { background: linear-gradient(45deg, #27ae60, #2ecc71); border: none; }
-        .btn-danger { background: linear-gradient(45deg, #c0392b, #e74c3c); border: none; }
-        .btn-warning { background: linear-gradient(45deg, #f39c12, #f1c40f); border: none; color: #fff; }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 14px rgba(0,0,0,0.15);
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%);
-            border-left: 5px solid var(--primary-color);
-        }
-
-        /* Floating Action Button */
-        .floating-action {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            z-index: 1000;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1rem 1.5rem;
         }
         
-        .floating-btn {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff00cc, #333399);
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .section-title {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
             color: white;
             border: none;
-            font-size: 28px;
-            box-shadow: 0 10px 25px rgba(51, 51, 153, 0.5);
-            animation: pulse-glow 2s infinite;
+            border-radius: 50px;
+            padding: 0.6rem 1.8rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-container {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            transition: width 0.5s ease;
+        }
+        
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .floating-btn:hover {
-            transform: rotate(90deg) scale(1.1);
-        }
-
-        /* Footer Signature */
-        .paul-signature {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.85);
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
             color: white;
+        }
+        
+        .water-icon { background-color: #17a2b8; }
+        .weight-icon { background-color: #ff6b6b; }
+        .walk-icon { background-color: #2d936c; }
+        .medicine-icon { background-color: #6c757d; }
+        .exercise-icon { background-color: #f9a826; }
+        .food-icon { background-color: #9b59b6; }
+        
+        .stat-box {
             text-align: center;
-            padding: 10px 0;
-            font-size: 16px;
-            z-index: 999;
-            backdrop-filter: blur(5px);
-            border-top: 2px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
         }
-
-        .paul-name {
-            font-weight: 800;
+        
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .medication-item {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .medication-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkmark.checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+        
+        .fasting-info {
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        
+        .footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .export-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        
+        .export-btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        
+        .current-time-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.3rem 1rem;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .current-time-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #ced4da;
+            padding: 0.6rem 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 111, 165, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .history-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent-color);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .history-date {
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+        
+        .history-weight {
+            font-weight: 700;
+            color: var(--accent-color);
             font-size: 1.2rem;
-            background: linear-gradient(270deg, #ff00cc, #333399, #00c6fb, #f1c40f);
-            background-size: 800% 800%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient-text 5s ease infinite;
-            display: inline-block;
-            margin: 0 10px;
         }
-
-        .moving-icon {
-            display: inline-block;
-            animation: float 2s ease-in-out infinite;
-            color: var(--warning-color);
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 94, 98, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 94, 98, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 94, 98, 0); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.5s ease;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 15px;
+            background-color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="app-container animate-up">
-            <div class="app-header">
-                <h1><i class="fas fa-heartbeat me-2"></i>تطبيق اللياقة الذكي</h1>
-                <p class="mb-0">تتبع صحتك بأسلوب عصري ومتطور</p>
-            </div>
-            
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab"><i class="fas fa-home me-1"></i>الرئيسية</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="weight-tab" data-bs-toggle="tab" data-bs-target="#weight" type="button" role="tab"><i class="fas fa-weight me-1"></i>الوزن</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="food-tab" data-bs-toggle="tab" data-bs-target="#food" type="button" role="tab"><i class="fas fa-utensils me-1"></i>الطعام</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="water-tab" data-bs-toggle="tab" data-bs-target="#water" type="button" role="tab"><i class="fas fa-tint me-1"></i>المياه</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab"><i class="fas fa-walking me-1"></i>النشاط</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="medication-tab" data-bs-toggle="tab" data-bs-target="#medication" type="button" role="tab"><i class="fas fa-pills me-1"></i>أدوية</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button" role="tab"><i class="fas fa-chart-pie me-1"></i>التقارير</button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="home" role="tabpanel">
-                    <div class="motivation-quote animate-up delay-1 text-center p-3 bg-light rounded mb-4" style="border-right: 4px solid var(--primary-color);">
-                        <i class="fas fa-quote-left me-2 text-primary"></i>
-                        <span id="daily-quote" class="fw-bold">النجاح هو مجموع الجهود الصغيرة المتكررة يومياً</span>
-                        <i class="fas fa-quote-right ms-2 text-primary"></i>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-4 mb-3">
-                            <div class="card stat-card animate-up delay-2">
-                                <div class="card-body text-center">
-                                    <div class="stat-value h2 fw-bold text-primary" id="current-weight">--</div>
-                                    <div class="stat-label text-muted">الوزن الحالي (كجم)</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card stat-card animate-up delay-3">
-                                <div class="card-body text-center">
-                                    <div class="stat-value h2 fw-bold text-success" id="total-calories">0</div>
-                                    <div class="stat-label text-muted">السعرات اليوم</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card stat-card animate-up delay-4">
-                                <div class="card-body text-center">
-                                    <div class="stat-value h2 fw-bold text-info" id="steps-today">0</div>
-                                    <div class="stat-label text-muted">خطوات اليوم التقريبية</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card animate-up delay-4">
-                        <div class="card-header">
-                            <i class="fas fa-chart-line me-2"></i>تقدم خسارة الوزن
-                        </div>
-                        <div class="card-body">
-                            <div class="weight-chart" id="weight-chart" style="height: 200px; display: flex; align-items: flex-end; justify-content: space-around; background: #f9f9f9; border-radius: 10px; padding: 10px;">
-                                </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="weight" role="tabpanel">
-                    <div class="card animate-up">
-                        <div class="card-header"><i class="fas fa-plus-circle me-2"></i>إضافة وزن جديد</div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">الوزن (كجم)</label>
-                                    <input type="number" class="form-control" id="weight-input" step="0.1">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">التاريخ</label>
-                                    <input type="date" class="form-control" id="weight-date">
-                                </div>
-                            </div>
-                            <button class="btn btn-primary w-100" id="add-weight-btn"><i class="fas fa-save me-1"></i>حفظ</button>
-                        </div>
-                    </div>
-                    <div class="card animate-up delay-1">
-                        <div class="card-header"><i class="fas fa-history me-2"></i>السجل</div>
-                        <div class="card-body p-0" id="weight-history"></div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="food" role="tabpanel">
-                    <div class="card animate-up">
-                        <div class="card-header"><i class="fas fa-robot me-2"></i>محلل الطعام الذكي</div>
-                        <div class="card-body">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="food-ai-input" placeholder="ماذا أكلت؟ (مثال: بيض مسلوق)">
-                                <button class="btn btn-primary" id="ai-food-btn">تحليل</button>
-                            </div>
-                            <div id="ai-food-response" class="alert alert-light border">نتيجة التحليل ستظهر هنا...</div>
-                            <button class="btn btn-success w-100 mt-2" id="add-ai-food-btn" style="display: none;">إضافة لليوم</button>
-                        </div>
-                    </div>
-                    <div class="card animate-up delay-1">
-                        <div class="card-header">وجبات اليوم</div>
-                        <div class="card-body p-0" id="today-food"></div>
-                    </div>
-                </div>
+    <!-- Login Screen (Initially shown) -->
+    <div id="loginScreen" class="login-container">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold" style="color: var(--primary-color);">تسجيل الدخول</h2>
+            <p class="text-muted">أدخل بياناتك للوصول إلى نظام متابعة الصحة</p>
+        </div>
+        
+        <div class="mb-3">
+            <label for="loginEmail" class="form-label">البريد الإلكتروني</label>
+            <input type="email" class="form-control" id="loginEmail" placeholder="name@example.com">
+        </div>
+        
+        <div class="mb-4">
+            <label for="loginPassword" class="form-label">كلمة المرور</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="أدخل كلمة المرور">
+        </div>
+        
+        <button id="loginBtn" class="btn btn-custom w-100 mb-3">تسجيل الدخول</button>
+        <button id="signupBtn" class="btn btn-outline-primary w-100">إنشاء حساب جديد</button>
+        
+        <div class="text-center mt-4">
+            <p class="text-muted small">بتسجيل الدخول، فإنك توافق على <a href="#">شروط الخدمة</a> و <a href="#">سياسة الخصوصية</a></p>
+        </div>
+    </div>
 
-                <div class="tab-pane fade" id="water" role="tabpanel">
-                    <div class="card animate-up">
-                        <div class="card-header bg-info text-white">
-                            <i class="fas fa-tint me-2"></i>تتبع شرب المياه
+    <!-- Main App (Initially hidden) -->
+    <div id="appContainer" class="container-fluid" style="display: none;">
+        <!-- Header -->
+        <div class="header text-center">
+            <h1><i class="fas fa-heartbeat me-2"></i> نظام متابعة الصحة والتغذية</h1>
+            <p>تابع وزنك، شرب المياه، الأدوية، المشي والتمارين اليومية</p>
+            <div class="designer-name">تصميم مهندس بولس سمير</div>
+            <div class="mt-3">
+                <button id="logoutBtn" class="btn btn-light btn-sm">تسجيل الخروج</button>
+                <span id="userEmail" class="badge bg-light text-dark ms-2"></span>
+            </div>
+        </div>
+        
+        <!-- Fasting Info -->
+        <div class="fasting-info text-center">
+            <i class="fas fa-clock me-2"></i> نظام الصيام المتقطع: 18 ساعة من الساعة 9 مساءً إلى 3 ظهرًا
+        </div>
+        
+        <div class="row">
+            <!-- Left Column - Data Entry -->
+            <div class="col-lg-8">
+                <!-- Date Selection -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-alt me-2"></i> تحديد التاريخ واليوم
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="entryDate" class="form-label">التاريخ</label>
+                                <input type="date" class="form-control" id="entryDate">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="entryDay" class="form-label">اليوم</label>
+                                <select class="form-select" id="entryDay">
+                                    <option value="السبت">السبت</option>
+                                    <option value="الأحد">الأحد</option>
+                                    <option value="الإثنين">الإثنين</option>
+                                    <option value="الثلاثاء">الثلاثاء</option>
+                                    <option value="الأربعاء">الأربعاء</option>
+                                    <option value="الخميس">الخميس</option>
+                                    <option value="الجمعة">الجمعة</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="card-body text-center">
-                            <h5 class="mb-4">هدفك اليومي: <span id="water-goal-display">3000</span> مل</h5>
-                            
-                            <div class="water-container">
-                                <div class="big-water-cup">
-                                    <div class="water-level" id="cup-fill"></div>
-                                    <div style="position: absolute; width: 100%; top: 50%; transform: translateY(-50%); z-index: 2; font-weight: bold; color: #333; text-shadow: 0 0 5px white;">
-                                        <span id="current-water-amount">0</span> مل
+                    </div>
+                </div>
+                
+                <!-- Weight Tracking -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-weight me-2"></i> متابعة الوزن
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 mb-3">
+                                <label for="weightInput" class="form-label">الوزن (كجم)</label>
+                                <input type="number" step="0.1" class="form-control" id="weightInput" placeholder="أدخل وزنك اليوم">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="currentWeightDisplay">--</div>
+                                    <div class="stat-label">الوزن الحالي (كجم)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-container mt-3">
+                            <div class="progress-bar" id="weightProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small>الوزن الابتدائي: <span id="initialWeight">--</span> كجم</small>
+                            <small>الهدف: <span id="targetWeight">--</span> كجم</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Water Intake -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-tint me-2"></i> شرب المياه
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 mb-3">
+                                <label for="waterInput" class="form-label">عدد الأكواب الصغيرة (250 مل)</label>
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary" type="button" id="decreaseWater">-</button>
+                                    <input type="number" class="form-control text-center" id="waterInput" value="0" min="0" max="20">
+                                    <button class="btn btn-outline-secondary" type="button" id="increaseWater">+</button>
+                                </div>
+                                <small class="text-muted">الهدف: 8 أكواب يومياً (2 لتر)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="waterDisplay">0/8</div>
+                                    <div class="stat-label">أكواب مياه اليوم</div>
+                                    <div class="progress-container mt-2">
+                                        <div class="progress-bar" id="waterProgress" style="width: 0%"></div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="water-controls mt-4 d-flex justify-content-center gap-2 flex-wrap">
-                                <button class="btn btn-outline-primary rounded-pill" onclick="addWater(250)">
-                                    <i class="fas fa-glass-whiskey me-1"></i> كوب (250مل)
-                                </button>
-                                <button class="btn btn-outline-info rounded-pill" onclick="addWater(500)">
-                                    <i class="fas fa-wine-bottle me-1"></i> زجاجة (500مل)
-                                </button>
-                                <button class="btn btn-outline-warning rounded-pill" onclick="resetDailyWater()">
-                                    <i class="fas fa-undo me-1"></i> تصفير اليوم
-                                </button>
-                            </div>
-                            
-                            <div class="progress mt-4" style="height: 25px;">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" id="water-progress-bar" role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <div class="d-flex justify-content-center flex-wrap" id="waterCupsContainer">
+                                <!-- Water cups will be generated here by JavaScript -->
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="tab-pane fade" id="activity" role="tabpanel">
-                    <div class="card animate-up">
-                        <div class="card-header"><i class="fas fa-walking me-2"></i>تسجيل نشاط</div>
-                        <div class="card-body">
-                            <div class="row g-2">
-                                <div class="col-6"><select class="form-select" id="activity-type"><option value="مشي">مشي</option><option value="جري">جري</option><option value="تمرين">تمرين</option></select></div>
-                                <div class="col-6"><input type="number" class="form-control" id="activity-duration" placeholder="المدة (ساعات)"></div>
-                                <div class="col-12"><input type="date" class="form-control" id="activity-date"></div>
-                            </div>
-                            <button class="btn btn-primary w-100 mt-3" id="add-activity-btn">حفظ النشاط</button>
-                        </div>
+                <!-- Medications -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-pills me-2"></i> الأدوية
                     </div>
-                    <div class="card animate-up delay-1">
-                        <div class="card-body p-0" id="activity-history"></div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">انقر على علامة الاختيار عند تناول كل دواء</p>
+                        <div id="medicationsList">
+                            <!-- Medications will be added here by JavaScript -->
+                        </div>
                     </div>
                 </div>
                 
-                <div class="tab-pane fade" id="medication" role="tabpanel">
-                    <div class="card animate-up">
-                        <div class="card-header">إضافة دواء</div>
-                        <div class="card-body">
-                            <input type="text" class="form-control mb-2" id="med-name" placeholder="اسم الدواء">
-                            <input type="text" class="form-control mb-2" id="med-dosage" placeholder="الجرعة">
-                            <input type="time" class="form-control mb-2" id="med-time">
-                            <button class="btn btn-primary w-100" id="add-medication-btn">إضافة</button>
-                        </div>
+                <!-- Walking & Plank -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-walking me-2"></i> المشي وتمرين البلانك
                     </div>
-                    <div class="card animate-up delay-1">
-                        <div class="card-body p-0" id="medication-list"></div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="walkingInput" class="form-label">المشي (دقائق)</label>
+                                <input type="number" class="form-control" id="walkingInput" placeholder="أدخل مدة المشي">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="plankInput" class="form-label">تمرين البلانك (دقائق)</label>
+                                <input type="number" class="form-control" id="plankInput" placeholder="أدخل مدة التمرين">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="walkingDisplay">--</div>
+                                    <div class="stat-label">دقائق المشي</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-box">
+                                    <div class="stat-value" id="plankDisplay">--</div>
+                                    <div class="stat-label">دقائق البلانك</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="tab-pane fade" id="report" role="tabpanel">
-                    <div class="daily-report-card animate-up" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px; padding: 20px;">
-                        <div class="row text-center">
-                            <div class="col-3">
-                                <h3 id="report-calories">0</h3>
-                                <small>سعرات</small>
+                <!-- Meal Times -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-utensils me-2"></i> مواعيد الوجبات
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="mealTimeInput" class="form-label">وقت الوجبة</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="mealTimeInput" placeholder="00:00 ص">
+                                    <button class="btn btn-outline-secondary current-time-btn" type="button" id="setCurrentMealTime">
+                                        <i class="fas fa-clock me-1"></i> الوقت الحالي
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-3">
-                                <h3 id="report-steps">0</h3>
-                                <small>خطوات</small>
-                            </div>
-                            <div class="col-3">
-                                <h3 id="report-water-cups">0</h3>
-                                <small>ماء (مل)</small>
-                            </div>
-                            <div class="col-3">
-                                <h3 id="report-activity">0</h3>
-                                <small>نشاط (د)</small>
+                            <div class="col-md-6">
+                                <label for="mealDescription" class="form-label">وصف الوجبة</label>
+                                <input type="text" class="form-control" id="mealDescription" placeholder="مثل: فطار، غداء، عشاء">
                             </div>
                         </div>
+                        <button class="btn btn-custom" id="addMealBtn">
+                            <i class="fas fa-plus me-1"></i> إضافة وجبة
+                        </button>
+                        <div class="mt-3" id="mealsList">
+                            <!-- Meals will be added here by JavaScript -->
+                        </div>
                     </div>
-                    <div id="achievements-list" class="mt-3 animate-up delay-2"></div>
-                    <button class="btn btn-warning w-100 mt-3" id="share-report-btn">مشاركة التقرير</button>
+                </div>
+                
+                <!-- Save Button -->
+                <div class="d-grid gap-2 mb-4">
+                    <button class="btn btn-custom btn-lg" id="saveDayBtn">
+                        <i class="fas fa-save me-2"></i> حفظ البيانات اليومية
+                    </button>
                 </div>
             </div>
             
-            <div class="p-4 border-top bg-light d-flex flex-wrap gap-2 justify-content-center">
-                <button class="btn btn-success flex-grow-1" id="export-data-btn"><i class="fas fa-download me-1"></i> تصدير</button>
-                <button class="btn btn-primary flex-grow-1" id="import-data-btn"><i class="fas fa-upload me-1"></i> استيراد</button>
-                <button class="btn btn-danger flex-grow-1" onclick="clearAllData()"><i class="fas fa-trash-alt me-1"></i> حذف البيانات (تصفير)</button>
-                <input type="file" id="import-file" style="display: none;" accept=".json">
-            </div>
-        </div>
-    </div>
-
-    <div class="floating-action">
-        <button class="floating-btn" data-bs-toggle="modal" data-bs-target="#quickAddModal">
-            <i class="fas fa-plus"></i>
-        </button>
-    </div>
-
-    <div class="modal fade" id="quickAddModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 20px;">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">إضافة سريعة</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <!-- Right Column - Stats & History -->
+            <div class="col-lg-4">
+                <!-- Today's Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line me-2"></i> إحصائيات اليوم
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-4">
+                                <div class="icon-box weight-icon">
+                                    <i class="fas fa-weight"></i>
+                                </div>
+                                <div class="stat-value" id="todayWeightStat">--</div>
+                                <div class="stat-label">الوزن</div>
+                            </div>
+                            <div class="col-6 mb-4">
+                                <div class="icon-box water-icon">
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <div class="stat-value" id="todayWaterStat">0/8</div>
+                                <div class="stat-label">أكواب مياه</div>
+                            </div>
+                            <div class="col-6 mb-4">
+                                <div class="icon-box walk-icon">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="stat-value" id="todayWalkStat">--</div>
+                                <div class="stat-label">دقائق مشي</div>
+                            </div>
+                            <div class="col-6 mb-4">
+                                <div class="icon-box exercise-icon">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div class="stat-value" id="todayPlankStat">--</div>
+                                <div class="stat-label">دقائق بلانك</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body p-4">
-                    <div class="d-grid gap-3">
-                        <button class="btn btn-primary py-3" data-bs-dismiss="modal" onclick="switchToTab('weight')"><i class="fas fa-weight me-2"></i>وزن</button>
-                        <button class="btn btn-success py-3" data-bs-dismiss="modal" onclick="switchToTab('food')"><i class="fas fa-utensils me-2"></i>طعام</button>
-                        <button class="btn btn-info py-3 text-white" data-bs-dismiss="modal" onclick="switchToTab('water')"><i class="fas fa-tint me-2"></i>مياه</button>
-                        <button class="btn btn-warning py-3 text-white" data-bs-dismiss="modal" onclick="switchToTab('activity')"><i class="fas fa-walking me-2"></i>نشاط</button>
+                
+                <!-- Export Options -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-download me-2"></i> تصدير البيانات
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="text-muted mb-3">تصدير تقريرك اليومي أو جميع البيانات</p>
+                        <button class="btn export-btn mb-2" id="exportTodayBtn">
+                            <i class="fas fa-file-pdf me-1"></i> تصدير تقرير اليوم
+                        </button>
+                        <button class="btn export-btn" id="exportAllBtn">
+                            <i class="fas fa-file-excel me-1"></i> تصدير جميع البيانات
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Weight Progress Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line me-2"></i> تطور الوزن
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-history me-2"></i> السجل اليومي
+                    </div>
+                    <div class="card-body">
+                        <div id="historyList">
+                            <!-- History items will be added here by JavaScript -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-outline-primary btn-sm" id="loadMoreHistory">تحميل المزيد</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="paul-signature">
-        <div class="container">
-            <i class="fas fa-code moving-icon"></i>
-            تصميم وتطوير
-            <span class="paul-name">مهندس / بولس سمير</span>
-            <i class="fas fa-laptop-code moving-icon"></i>
+        
+        <!-- Footer -->
+        <div class="footer text-center">
+            <div class="container">
+                <h5 class="mb-3">نظام متابعة الصحة والتغذية</h5>
+                <p class="mb-2">تابع تطورك الصحي وحقق أهدافك مع نظام متكامل وسهل الاستخدام</p>
+                <p class="mb-0">تصميم وتطوير: مهندس بولس سمير | جميع الحقوق محفوظة &copy; <span id="currentYear"></span></p>
+                <div class="mt-3">
+                    <i class="fas fa-mobile-alt me-2"></i> متوافق مع جميع الأجهزة 
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // === بيانات التطبيق ===
-        let appData = {
-            weightHistory: [],
-            foodHistory: [],
-            activityHistory: [],
-            medications: [],
-            waterIntake: [], // {date: 'YYYY-MM-DD', amount: ml}
-            settings: { calorieGoal: 1800, stepGoal: 10000, waterGoal: 3000 }
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkqqU_3KbEW_FFFK-Sy8QASI0-jsAfycM",
+            authDomain: "health-ea6cd.firebaseapp.com",
+            projectId: "health-ea6cd",
+            storageBucket: "health-ea6cd.firebasestorage.app",
+            messagingSenderId: "836059005460",
+            appId: "1:836059005460:web:9d3768d1925288322e9d01"
         };
 
-        const foodDatabase = [
-            { name: "تفاحة", calories: 52 }, { name: "موز", calories: 89 }, 
-            { name: "خبز", calories: 265 }, { name: "أرز", calories: 130 },
-            { name: "دجاج", calories: 165 }, { name: "بيض", calories: 155 }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // Global Variables
+        let currentUser = null;
+        let todayData = {};
+        let weightHistory = [];
+        let currentDate = new Date().toISOString().split('T')[0];
+        let weightChart = null;
+        
+        // Days in Arabic
+        const daysInArabic = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        
+        // Medications List
+        const medications = [
+            { id: 1, name: "سودفاج بعد الغداء", checked: false },
+            { id: 2, name: "كويك سليم أثناء الغداء", checked: false },
+            { id: 3, name: "جروسليم قبل الغداء بنص ساعه", checked: false }
         ];
-
-        // === تهيئة التطبيق ===
+        
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const appContainer = document.getElementById('appContainer');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userEmail = document.getElementById('userEmail');
+        const entryDate = document.getElementById('entryDate');
+        const entryDay = document.getElementById('entryDay');
+        const weightInput = document.getElementById('weightInput');
+        const currentWeightDisplay = document.getElementById('currentWeightDisplay');
+        const weightProgress = document.getElementById('weightProgress');
+        const initialWeight = document.getElementById('initialWeight');
+        const targetWeight = document.getElementById('targetWeight');
+        const waterInput = document.getElementById('waterInput');
+        const decreaseWater = document.getElementById('decreaseWater');
+        const increaseWater = document.getElementById('increaseWater');
+        const waterDisplay = document.getElementById('waterDisplay');
+        const waterProgress = document.getElementById('waterProgress');
+        const waterCupsContainer = document.getElementById('waterCupsContainer');
+        const medicationsList = document.getElementById('medicationsList');
+        const walkingInput = document.getElementById('walkingInput');
+        const plankInput = document.getElementById('plankInput');
+        const walkingDisplay = document.getElementById('walkingDisplay');
+        const plankDisplay = document.getElementById('plankDisplay');
+        const mealTimeInput = document.getElementById('mealTimeInput');
+        const mealDescription = document.getElementById('mealDescription');
+        const setCurrentMealTime = document.getElementById('setCurrentMealTime');
+        const addMealBtn = document.getElementById('addMealBtn');
+        const mealsList = document.getElementById('mealsList');
+        const saveDayBtn = document.getElementById('saveDayBtn');
+        const todayWeightStat = document.getElementById('todayWeightStat');
+        const todayWaterStat = document.getElementById('todayWaterStat');
+        const todayWalkStat = document.getElementById('todayWalkStat');
+        const todayPlankStat = document.getElementById('todayPlankStat');
+        const exportTodayBtn = document.getElementById('exportTodayBtn');
+        const exportAllBtn = document.getElementById('exportAllBtn');
+        const historyList = document.getElementById('historyList');
+        const loadMoreHistory = document.getElementById('loadMoreHistory');
+        const currentYear = document.getElementById('currentYear');
+        
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            initializeApp();
+            // Set current year in footer
+            currentYear.textContent = new Date().getFullYear();
             
-            // تعيين التاريخ الحالي
-            const today = new Date().toISOString().split('T')[0];
-            if(document.getElementById('weight-date')) document.getElementById('weight-date').value = today;
-            if(document.getElementById('activity-date')) document.getElementById('activity-date').value = today;
+            // Set today's date
+            const today = new Date();
+            entryDate.value = currentDate;
+            entryDay.value = daysInArabic[today.getDay()];
+            
+            // Set current time button functionality
+            setCurrentMealTime.addEventListener('click', setCurrentTime);
+            
+            // Initialize water cups
+            initWaterCups();
+            
+            // Initialize medications
+            renderMedications();
+            
+            // Initialize event listeners
+            initEventListeners();
+            
+            // Check if user is already logged in
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    currentUser = user;
+                    showApp();
+                    loadUserData();
+                } else {
+                    // No user is signed in
+                    showLogin();
+                }
+            });
+            
+            // Set up login/signup
+            loginBtn.addEventListener('click', handleLogin);
+            signupBtn.addEventListener('click', handleSignup);
+            logoutBtn.addEventListener('click', handleLogout);
         });
-
-        function initializeApp() {
-            updateWeightChart();
-            updateWeightHistory();
-            updateTodayFood();
-            updateMedicationList();
-            updateActivityHistory();
-            updateStats();
-            updateWaterUI(); // تحديث واجهة المياه
-            updateDailyReport();
-        }
-
-        // === وظائف تتبع المياه (جديد) ===
-        function addWater(amount) {
-            const today = new Date().toISOString().split('T')[0];
-            let todayEntry = appData.waterIntake.find(w => w.date === today);
-            
-            if (!todayEntry) {
-                todayEntry = { date: today, amount: 0 };
-                appData.waterIntake.push(todayEntry);
-            }
-            
-            todayEntry.amount += amount;
-            saveData();
-            updateWaterUI();
-            updateDailyReport();
-            
-            // تأثير صوتي بسيط (اختياري)
-            // new Audio('water-drop.mp3').play().catch(e => {}); 
-        }
-
-        function resetDailyWater() {
-            const today = new Date().toISOString().split('T')[0];
-            const index = appData.waterIntake.findIndex(w => w.date === today);
-            if (index !== -1) {
-                appData.waterIntake[index].amount = 0;
-                saveData();
-                updateWaterUI();
-                updateDailyReport();
-            }
-        }
-
-        function updateWaterUI() {
-            const today = new Date().toISOString().split('T')[0];
-            const entry = appData.waterIntake.find(w => w.date === today);
-            const currentAmount = entry ? entry.amount : 0;
-            const goal = appData.settings.waterGoal;
-            
-            // تحديث النص
-            document.getElementById('current-water-amount').textContent = currentAmount;
-            
-            // تحديث الكوب الكبير
-            const percentage = Math.min((currentAmount / goal) * 100, 100);
-            document.getElementById('cup-fill').style.height = `${percentage}%`;
-            
-            // تحديث شريط التقدم
-            const progressBar = document.getElementById('water-progress-bar');
-            progressBar.style.width = `${percentage}%`;
-            progressBar.textContent = `${Math.round(percentage)}%`;
-            
-            if(percentage >= 100) {
-                progressBar.classList.remove('bg-info');
-                progressBar.classList.add('bg-success');
-                progressBar.textContent = "ممتاز! اكتمل الهدف";
-            } else {
-                progressBar.classList.remove('bg-success');
-                progressBar.classList.add('bg-info');
-            }
-        }
-
-        // === وظيفة تصفير البيانات (جديد) ===
-        function clearAllData() {
-            if (confirm("تحذير هام!\nهل أنت متأكد تماماً من رغبتك في حذف جميع البيانات وتصفير التطبيق؟\nلا يمكن التراجع عن هذا الإجراء.")) {
-                localStorage.removeItem('fitnessTrackerData');
-                appData = {
-                    weightHistory: [],
-                    foodHistory: [],
-                    activityHistory: [],
-                    medications: [],
-                    waterIntake: [],
-                    settings: { calorieGoal: 1800, stepGoal: 10000, waterGoal: 3000 }
-                };
-                
-                // تأثير حركي قبل إعادة التحميل
-                document.querySelector('.app-container').style.transform = 'scale(0.8) rotate(5deg)';
-                document.querySelector('.app-container').style.opacity = '0';
-                
-                setTimeout(() => {
-                    location.reload();
-                }, 500);
-            }
-        }
-
-        // === الوظائف الأساسية الموجودة سابقاً (محدثة) ===
         
-        // --- الوزن ---
-        document.getElementById('add-weight-btn').addEventListener('click', function() {
-            const w = parseFloat(document.getElementById('weight-input').value);
-            const d = document.getElementById('weight-date').value;
-            if (w && d) {
-                appData.weightHistory.push({ weight: w, date: d });
-                appData.weightHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-                saveData();
-                initializeApp();
-                alert('تم حفظ الوزن');
-                document.getElementById('weight-input').value = '';
-            }
-        });
-
-        function updateWeightChart() {
-            const chart = document.getElementById('weight-chart');
-            chart.innerHTML = '';
-            const data = appData.weightHistory.slice(0, 7).reverse(); // آخر 7 قياسات
-            if (data.length === 0) { chart.innerHTML = '<p class="text-center w-100">لا توجد بيانات</p>'; return; }
-            
-            const maxW = Math.max(...data.map(i => i.weight)) + 5;
-            data.forEach(item => {
-                const barHeight = (item.weight / maxW) * 100;
-                const bar = document.createElement('div');
-                bar.style.height = `${barHeight}%`;
-                bar.style.width = '20px';
-                bar.style.background = 'linear-gradient(to top, #3498db, #2ecc71)';
-                bar.style.borderRadius = '5px 5px 0 0';
-                bar.style.position = 'relative';
-                bar.title = `${item.weight}kg - ${item.date}`;
-                
-                // Label
-                const lbl = document.createElement('div');
-                lbl.innerText = item.weight;
-                lbl.style.fontSize = '10px';
-                lbl.style.position = 'absolute';
-                lbl.style.top = '-20px';
-                lbl.style.width = '100%';
-                lbl.style.textAlign = 'center';
-                
-                bar.appendChild(lbl);
-                chart.appendChild(bar);
+        // Initialize event listeners
+        function initEventListeners() {
+            // Water intake controls
+            decreaseWater.addEventListener('click', () => {
+                waterInput.value = Math.max(0, parseInt(waterInput.value) - 1);
+                updateWaterDisplay();
             });
             
-            // تحديث البطاقة الرئيسية
-            if(appData.weightHistory.length > 0) {
-                document.getElementById('current-weight').textContent = appData.weightHistory[0].weight;
-            }
-        }
-
-        function updateWeightHistory() {
-            const container = document.getElementById('weight-history');
-            container.innerHTML = '';
-            appData.weightHistory.forEach((item, idx) => {
-                container.innerHTML += `
-                    <div class="d-flex justify-content-between p-3 border-bottom ${idx % 2 === 0 ? 'bg-light' : ''}">
-                        <span>${item.date}</span>
-                        <span class="fw-bold">${item.weight} كجم</span>
-                    </div>
-                `;
+            increaseWater.addEventListener('click', () => {
+                waterInput.value = Math.min(20, parseInt(waterInput.value) + 1);
+                updateWaterDisplay();
             });
-        }
-
-        // --- الطعام ---
-        document.getElementById('ai-food-btn').addEventListener('click', function() {
-            const input = document.getElementById('food-ai-input').value;
-            const btn = document.getElementById('add-ai-food-btn');
-            const res = document.getElementById('ai-food-response');
             
-            res.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحليل...';
+            waterInput.addEventListener('change', updateWaterDisplay);
             
-            setTimeout(() => {
-                const found = foodDatabase.find(f => input.includes(f.name));
-                let resultFood = found || { name: input, calories: Math.floor(Math.random() * 300) + 50, isEst: true };
-                
-                res.innerHTML = `<strong>${resultFood.name}</strong>: ${resultFood.calories} سعرة حرارية`;
-                res.className = 'alert alert-success border';
-                btn.style.display = 'block';
-                btn.onclick = function() {
-                    const today = new Date().toISOString().split('T')[0];
-                    appData.foodHistory.push({ food: resultFood, date: today, time: new Date().toLocaleTimeString() });
-                    saveData();
-                    updateTodayFood();
-                    updateStats();
-                    updateDailyReport();
-                    btn.style.display = 'none';
-                    document.getElementById('food-ai-input').value = '';
-                    res.innerHTML = 'تمت الإضافة بنجاح!';
-                };
-            }, 1000);
-        });
-
-        function updateTodayFood() {
-            const today = new Date().toISOString().split('T')[0];
-            const list = appData.foodHistory.filter(f => f.date === today);
-            const container = document.getElementById('today-food');
-            container.innerHTML = '';
-            let total = 0;
-            list.forEach(item => {
-                total += item.food.calories;
-                container.innerHTML += `
-                    <div class="d-flex justify-content-between p-3 border-bottom">
-                        <span>${item.food.name}</span>
-                        <span class="badge bg-primary rounded-pill">${item.food.calories} سعرة</span>
-                    </div>
-                `;
-            });
-            document.getElementById('total-calories').textContent = total;
-        }
-
-        // --- النشاط ---
-        document.getElementById('add-activity-btn').addEventListener('click', function() {
-            const type = document.getElementById('activity-type').value;
-            const dur = parseFloat(document.getElementById('activity-duration').value);
-            const date = document.getElementById('activity-date').value;
+            // Add meal button
+            addMealBtn.addEventListener('click', addMeal);
             
-            if(dur && date) {
-                // حساب تقريبي للسعرات (ساعة مشي = 250)
-                let cals = dur * 250; 
-                if(type === 'جري') cals = dur * 400;
-                
-                appData.activityHistory.push({ type, duration: dur, date, cals: Math.round(cals) });
-                saveData();
-                updateActivityHistory();
-                updateStats();
-                updateDailyReport();
-                alert('تم حفظ النشاط');
-            }
-        });
-
-        function updateActivityHistory() {
-            const container = document.getElementById('activity-history');
-            container.innerHTML = '';
-            appData.activityHistory.reverse().forEach(a => {
-                container.innerHTML += `
-                    <div class="d-flex justify-content-between p-3 border-bottom">
-                        <div><strong>${a.type}</strong> <small class="text-muted">(${a.duration} س)</small></div>
-                        <span class="text-success">-${a.cals} سعرة</span>
-                    </div>
-                `;
-            });
-        }
-
-        // --- الأدوية ---
-        document.getElementById('add-medication-btn').addEventListener('click', function() {
-            const name = document.getElementById('med-name').value;
-            const dose = document.getElementById('med-dosage').value;
-            const time = document.getElementById('med-time').value;
-            if(name) {
-                appData.medications.push({ name, dose, time, taken: false, id: Date.now() });
-                saveData();
-                updateMedicationList();
-                document.getElementById('med-name').value = '';
-            }
-        });
-
-        function updateMedicationList() {
-            const container = document.getElementById('medication-list');
-            container.innerHTML = '';
-            appData.medications.forEach(m => {
-                container.innerHTML += `
-                    <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-                        <div>
-                            <div class="fw-bold">${m.name}</div>
-                            <small>${m.dose} @ ${m.time}</small>
-                        </div>
-                        <button class="btn btn-sm btn-danger" onclick="deleteMed(${m.id})"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-            });
+            // Save day button
+            saveDayBtn.addEventListener('click', saveDayData);
+            
+            // Export buttons
+            exportTodayBtn.addEventListener('click', exportTodayReport);
+            exportAllBtn.addEventListener('click', exportAllData);
+            
+            // Load more history
+            loadMoreHistory.addEventListener('click', loadHistory);
+            
+            // Date change
+            entryDate.addEventListener('change', loadDayData);
         }
         
-        function deleteMed(id) {
-            appData.medications = appData.medications.filter(m => m.id !== id);
-            saveData();
-            updateMedicationList();
-        }
-
-        // --- الإحصائيات والتقارير ---
-        function updateStats() {
-            const today = new Date().toISOString().split('T')[0];
-            
-            // الخطوات (تقدير من النشاط)
-            const todayActs = appData.activityHistory.filter(a => a.date === today);
-            const steps = todayActs.reduce((acc, curr) => acc + (curr.duration * 6000), 0); // تقدير 6000 خطوة بالساعة
-            document.getElementById('steps-today').textContent = Math.round(steps);
-        }
-
-        function updateDailyReport() {
-            const today = new Date().toISOString().split('T')[0];
-            
-            const cals = document.getElementById('total-calories').textContent;
-            const steps = document.getElementById('steps-today').textContent;
-            
-            // المياه من البيانات الحقيقية
-            const waterEntry = appData.waterIntake.find(w => w.date === today);
-            const water = waterEntry ? waterEntry.amount : 0;
-
-            const acts = appData.activityHistory.filter(a => a.date === today);
-            const actMins = acts.reduce((acc, c) => acc + (c.duration * 60), 0);
-
-            document.getElementById('report-calories').textContent = cals;
-            document.getElementById('report-steps').textContent = steps;
-            document.getElementById('report-water-cups').textContent = water;
-            document.getElementById('report-activity').textContent = Math.round(actMins);
-            
-            // الإنجازات
-            const achList = document.getElementById('achievements-list');
-            achList.innerHTML = '';
-            if(water >= appData.settings.waterGoal) achList.innerHTML += '<div class="alert alert-info"><i class="fas fa-check-circle"></i> حققت هدف شرب الماء!</div>';
-            if(cals > 0 && cals < appData.settings.calorieGoal) achList.innerHTML += '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ملتزم بالسعرات الحرارية</div>';
-            if(steps > 5000) achList.innerHTML += '<div class="alert alert-warning"><i class="fas fa-fire"></i> نشاط بدني ممتاز</div>';
-        }
-
-        // --- مشاركة ---
-        document.getElementById('share-report-btn').addEventListener('click', function() {
-             const txt = `تقريري اليومي:\nسعرات: ${document.getElementById('report-calories').textContent}\nمياه: ${document.getElementById('report-water-cups').textContent} مل`;
-             if(navigator.share) navigator.share({ title: 'تقرير صحتي', text: txt });
-             else alert(txt);
-        });
-
-        // --- تخزين البيانات ---
-        function saveData() { localStorage.setItem('fitnessTrackerData', JSON.stringify(appData)); }
-        function loadData() {
-            const d = localStorage.getItem('fitnessTrackerData');
-            if(d) appData = JSON.parse(d);
-            // التأكد من وجود مصفوفة المياه إذا كانت البيانات قديمة
-            if(!appData.waterIntake) appData.waterIntake = [];
+        // Show login screen
+        function showLogin() {
+            loginScreen.style.display = 'block';
+            appContainer.style.display = 'none';
         }
         
-        // --- تصدير واستيراد ---
-        document.getElementById('export-data-btn').addEventListener('click', function() {
-            const dataStr = JSON.stringify(appData);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            const link = document.createElement('a');
-            link.setAttribute('href', dataUri);
-            link.setAttribute('download', 'health-data.json');
-            link.click();
-        });
-
-        document.getElementById('import-data-btn').addEventListener('click', () => document.getElementById('import-file').click());
-        document.getElementById('import-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    appData = JSON.parse(event.target.result);
-                    saveData();
-                    location.reload();
-                } catch(err) { alert('فشل استيراد الملف'); }
+        // Show app screen
+        function showApp() {
+            loginScreen.style.display = 'none';
+            appContainer.style.display = 'block';
+            userEmail.textContent = currentUser.email;
+        }
+        
+        // Handle login
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    showApp();
+                    loadUserData();
+                })
+                .catch((error) => {
+                    alert('خطأ في تسجيل الدخول: ' + error.message);
+                });
+        }
+        
+        // Handle signup
+        function handleSignup() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                alert('الرجاء إدخال البريد الإلكتروني وكلمة المرور');
+                return;
+            }
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    showApp();
+                    initializeUserData();
+                })
+                .catch((error) => {
+                    alert('خطأ في إنشاء الحساب: ' + error.message);
+                });
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            auth.signOut()
+                .then(() => {
+                    currentUser = null;
+                    showLogin();
+                })
+                .catch((error) => {
+                    alert('خطأ في تسجيل الخروج: ' + error.message);
+                });
+        }
+        
+        // Initialize user data in Firebase
+        function initializeUserData() {
+            const userRef = database.ref('users/' + currentUser.uid);
+            
+            const userData = {
+                email: currentUser.email,
+                initialWeight: 0,
+                targetWeight: 0,
+                createdAt: new Date().toISOString()
             };
-            reader.readAsText(file);
-        });
-
-        function switchToTab(tabId) {
-            const triggerEl = document.querySelector(`#${tabId}-tab`);
-            const tab = new bootstrap.Tab(triggerEl);
-            tab.show();
+            
+            userRef.set(userData)
+                .then(() => {
+                    loadUserData();
+                })
+                .catch((error) => {
+                    console.error('Error initializing user data:', error);
+                });
+        }
+        
+        // Load user data from Firebase
+        function loadUserData() {
+            const userRef = database.ref('users/' + currentUser.uid);
+            
+            userRef.once('value')
+                .then((snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        // Set initial and target weight
+                        initialWeight.textContent = userData.initialWeight || '--';
+                        targetWeight.textContent = userData.targetWeight || '--';
+                        
+                        // If no initial weight is set, ask for it
+                        if (!userData.initialWeight || userData.initialWeight === 0) {
+                            const initialWeightInput = prompt('الرجاء إدخال وزنك الحالي (كجم):');
+                            if (initialWeightInput && !isNaN(initialWeightInput)) {
+                                userRef.update({ initialWeight: parseFloat(initialWeightInput) });
+                                initialWeight.textContent = parseFloat(initialWeightInput);
+                            }
+                        }
+                        
+                        // If no target weight is set, ask for it
+                        if (!userData.targetWeight || userData.targetWeight === 0) {
+                            const targetWeightInput = prompt('الرجاء إدخال وزنك الهدف المراد الوصول اليه (كجم):');
+                            if (targetWeightInput && !isNaN(targetWeightInput)) {
+                                userRef.update({ targetWeight: parseFloat(targetWeightInput) });
+                                targetWeight.textContent = parseFloat(targetWeightInput);
+                            }
+                        }
+                    }
+                    
+                    // Load today's data
+                    loadDayData();
+                    
+                    // Load weight history
+                    loadWeightHistory();
+                    
+                    // Load history
+                    loadHistory();
+                })
+                .catch((error) => {
+                    console.error('Error loading user data:', error);
+                });
+        }
+        
+        // Load data for the selected date
+        function loadDayData() {
+            const selectedDate = entryDate.value;
+            
+            if (!currentUser) return;
+            
+            const dayRef = database.ref('users/' + currentUser.uid + '/days/' + selectedDate);
+            
+            dayRef.once('value')
+                .then((snapshot) => {
+                    const dayData = snapshot.val();
+                    
+                    if (dayData) {
+                        // Populate form with existing data
+                        todayData = dayData;
+                        
+                        // Weight
+                        if (dayData.weight) {
+                            weightInput.value = dayData.weight;
+                            currentWeightDisplay.textContent = dayData.weight;
+                            todayWeightStat.textContent = dayData.weight;
+                            
+                            // Update weight progress
+                            updateWeightProgress(dayData.weight);
+                        }
+                        
+                        // Water
+                        if (dayData.water) {
+                            waterInput.value = dayData.water;
+                            updateWaterDisplay();
+                            todayWaterStat.textContent = dayData.water + '/8';
+                        }
+                        
+                        // Medications
+                        if (dayData.medications) {
+                            medications.forEach((med, index) => {
+                                if (dayData.medications[index]) {
+                                    medications[index].checked = dayData.medications[index].checked;
+                                }
+                            });
+                            renderMedications();
+                        }
+                        
+                        // Walking
+                        if (dayData.walking) {
+                            walkingInput.value = dayData.walking;
+                            walkingDisplay.textContent = dayData.walking;
+                            todayWalkStat.textContent = dayData.walking;
+                        }
+                        
+                        // Plank
+                        if (dayData.plank) {
+                            plankInput.value = dayData.plank;
+                            plankDisplay.textContent = dayData.plank;
+                            todayPlankStat.textContent = dayData.plank;
+                        }
+                        
+                        // Meals
+                        if (dayData.meals) {
+                            renderMeals(dayData.meals);
+                        }
+                    } else {
+                        // No data for this date, reset form
+                        resetForm();
+                        todayData = {};
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error loading day data:', error);
+                    resetForm();
+                });
+        }
+        
+        // Load weight history for chart
+        function loadWeightHistory() {
+            if (!currentUser) return;
+            
+            const daysRef = database.ref('users/' + currentUser.uid + '/days');
+            
+            daysRef.once('value')
+                .then((snapshot) => {
+                    const daysData = snapshot.val();
+                    weightHistory = [];
+                    
+                    if (daysData) {
+                        Object.keys(daysData).forEach(date => {
+                            if (daysData[date].weight) {
+                                weightHistory.push({
+                                    date: date,
+                                    weight: daysData[date].weight
+                                });
+                            }
+                        });
+                        
+                        // Sort by date
+                        weightHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        
+                        // Update chart
+                        updateWeightChart();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error loading weight history:', error);
+                });
+        }
+        
+        // Load history entries
+        function loadHistory() {
+            if (!currentUser) return;
+            
+            const daysRef = database.ref('users/' + currentUser.uid + '/days');
+            
+            daysRef.limitToLast(10).once('value')
+                .then((snapshot) => {
+                    const daysData = snapshot.val();
+                    historyList.innerHTML = '';
+                    
+                    if (daysData) {
+                        const dates = Object.keys(daysData).sort().reverse();
+                        
+                        dates.forEach(date => {
+                            const dayData = daysData[date];
+                            const historyItem = document.createElement('div');
+                            historyItem.className = 'history-item animate-slide-in';
+                            
+                            const dateObj = new Date(date);
+                            const dayName = daysInArabic[dateObj.getDay()];
+                            
+                            let mealsHtml = '';
+                            if (dayData.meals && dayData.meals.length > 0) {
+                                mealsHtml = `<div class="mt-2"><small>الوجبات: ${dayData.meals.length}</small></div>`;
+                            }
+                            
+                            let medsTaken = 0;
+                            if (dayData.medications) {
+                                medsTaken = dayData.medications.filter(m => m.checked).length;
+                            }
+                            
+                            historyItem.innerHTML = `
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="history-date">${date} (${dayName})</div>
+                                        <div class="history-weight">${dayData.weight || '--'} كجم</div>
+                                        <div class="mt-1">
+                                            <small class="me-3"><i class="fas fa-tint"></i> ${dayData.water || 0}/8 كوب</small>
+                                            <small class="me-3"><i class="fas fa-walking"></i> ${dayData.walking || 0} د</small>
+                                            <small><i class="fas fa-dumbbell"></i> ${dayData.plank || 0} د</small>
+                                        </div>
+                                        ${mealsHtml}
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary">${medsTaken}/3 أدوية</span>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            historyList.appendChild(historyItem);
+                        });
+                    } else {
+                        historyList.innerHTML = '<p class="text-muted text-center">لا توجد بيانات سابقة</p>';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error loading history:', error);
+                });
+        }
+        
+        // Initialize water cups display
+        function initWaterCups() {
+            waterCupsContainer.innerHTML = '';
+            
+            for (let i = 1; i <= 8; i++) {
+                const cup = document.createElement('div');
+                cup.className = 'water-cup';
+                cup.style.cssText = `
+                    width: 40px;
+                    height: 40px;
+                    margin: 5px;
+                    border-radius: 50%;
+                    background-color: #e9ecef;
+                    display: inline-block;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                `;
+                cup.dataset.index = i;
+                
+                cup.addEventListener('click', function() {
+                    waterInput.value = this.dataset.index;
+                    updateWaterDisplay();
+                });
+                
+                waterCupsContainer.appendChild(cup);
+            }
+            
+            updateWaterDisplay();
+        }
+        
+        // Update water display and cups
+        function updateWaterDisplay() {
+            const waterCount = parseInt(waterInput.value) || 0;
+            const waterPercentage = Math.min(100, (waterCount / 8) * 100);
+            
+            waterDisplay.textContent = waterCount + '/8';
+            waterProgress.style.width = waterPercentage + '%';
+            todayWaterStat.textContent = waterCount + '/8';
+            
+            // Update water cups
+            const cups = document.querySelectorAll('.water-cup');
+            cups.forEach((cup, index) => {
+                if (index < waterCount) {
+                    cup.style.backgroundColor = '#17a2b8';
+                    cup.innerHTML = '<i class="fas fa-tint" style="color: white; line-height: 40px;"></i>';
+                } else {
+                    cup.style.backgroundColor = '#e9ecef';
+                    cup.innerHTML = '';
+                }
+            });
+        }
+        
+        // Render medications list
+        function renderMedications() {
+            medicationsList.innerHTML = '';
+            
+            medications.forEach((medication, index) => {
+                const medItem = document.createElement('div');
+                medItem.className = 'medication-item';
+                
+                medItem.innerHTML = `
+                    <div>
+                        <strong>${medication.name}</strong>
+                    </div>
+                    <div class="checkmark ${medication.checked ? 'checked' : ''}" data-index="${index}">
+                        ${medication.checked ? '<i class="fas fa-check"></i>' : ''}
+                    </div>
+                `;
+                
+                medicationsList.appendChild(medItem);
+            });
+            
+            // Add event listeners to checkmarks
+            document.querySelectorAll('.checkmark').forEach(checkmark => {
+                checkmark.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    medications[index].checked = !medications[index].checked;
+                    renderMedications();
+                });
+            });
+        }
+        
+        // Set current time in meal time input
+        function setCurrentTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'م' : 'ص';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 12 should be displayed as 12, not 0
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            mealTimeInput.value = `${hours}:${minutes} ${ampm}`;
+        }
+        
+        // Add a meal to the list
+        function addMeal() {
+            const time = mealTimeInput.value;
+            const description = mealDescription.value;
+            
+            if (!time || !description) {
+                alert('الرجاء إدخال وقت ووصف الوجبة');
+                return;
+            }
+            
+            // Create meal object
+            const meal = {
+                time: time,
+                description: description,
+                id: Date.now()
+            };
+            
+            // Add to today's data
+            if (!todayData.meals) {
+                todayData.meals = [];
+            }
+            
+            todayData.meals.push(meal);
+            
+            // Render meals
+            renderMeals(todayData.meals);
+            
+            // Clear inputs
+            mealTimeInput.value = '';
+            mealDescription.value = '';
+        }
+        
+        // Render meals list
+        function renderMeals(meals) {
+            mealsList.innerHTML = '';
+            
+            meals.forEach((meal, index) => {
+                const mealItem = document.createElement('div');
+                mealItem.className = 'medication-item';
+                
+                mealItem.innerHTML = `
+                    <div>
+                        <strong>${meal.description}</strong>
+                        <div class="text-muted small">${meal.time}</div>
+                    </div>
+                    <div class="text-danger" style="cursor: pointer;" data-index="${index}">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+                
+                mealsList.appendChild(mealItem);
+            });
+            
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.medication-item .text-danger').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    todayData.meals.splice(index, 1);
+                    renderMeals(todayData.meals);
+                });
+            });
+        }
+        
+        // Update weight progress bar
+        function updateWeightProgress(currentWeight) {
+            const initial = parseFloat(initialWeight.textContent) || 0;
+            const target = parseFloat(targetWeight.textContent) || 0;
+            
+            if (initial === 0 || target === 0) return;
+            
+            // Calculate progress (assuming we want to lose weight)
+            const totalToLose = initial - target;
+            const currentLoss = initial - currentWeight;
+            const progressPercentage = Math.min(100, Math.max(0, (currentLoss / totalToLose) * 100));
+            
+            weightProgress.style.width = progressPercentage + '%';
+        }
+        
+        // Update weight chart
+        function updateWeightChart() {
+            const ctx = document.getElementById('weightChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (weightChart) {
+                weightChart.destroy();
+            }
+            
+            if (weightHistory.length < 2) {
+                document.getElementById('weightChart').innerHTML = '<p class="text-muted text-center p-4">لا توجد بيانات كافية لعرض الرسم البياني</p>';
+                return;
+            }
+            
+            const dates = weightHistory.map(item => {
+                const date = new Date(item.date);
+                return `${date.getDate()}/${date.getMonth() + 1}`;
+            });
+            
+            const weights = weightHistory.map(item => item.weight);
+            
+            weightChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'الوزن (كجم)',
+                        data: weights,
+                        borderColor: 'rgba(74, 111, 165, 1)',
+                        backgroundColor: 'rgba(74, 111, 165, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            rtl: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'الوزن (كجم)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'التاريخ'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Save day data to Firebase
+        function saveDayData() {
+            if (!currentUser) {
+                alert('الرجاء تسجيل الدخول أولاً');
+                return;
+            }
+            
+            const selectedDate = entryDate.value;
+            
+            // Prepare data object
+            const dayData = {
+                date: selectedDate,
+                day: entryDay.value,
+                weight: parseFloat(weightInput.value) || null,
+                water: parseInt(waterInput.value) || 0,
+                medications: medications,
+                walking: parseInt(walkingInput.value) || 0,
+                plank: parseInt(plankInput.value) || 0,
+                meals: todayData.meals || [],
+                savedAt: new Date().toISOString()
+            };
+            
+            // Save to Firebase
+            const dayRef = database.ref('users/' + currentUser.uid + '/days/' + selectedDate);
+            
+            dayRef.set(dayData)
+                .then(() => {
+                    alert('تم حفظ البيانات بنجاح!');
+                    todayData = dayData;
+                    
+                    // Update displays
+                    currentWeightDisplay.textContent = dayData.weight || '--';
+                    walkingDisplay.textContent = dayData.walking || '--';
+                    plankDisplay.textContent = dayData.plank || '--';
+                    
+                    // Update stats
+                    todayWeightStat.textContent = dayData.weight || '--';
+                    todayWalkStat.textContent = dayData.walking || '--';
+                    todayPlankStat.textContent = dayData.plank || '--';
+                    
+                    // Update weight progress
+                    if (dayData.weight) {
+                        updateWeightProgress(dayData.weight);
+                    }
+                    
+                    // Reload weight history and chart
+                    loadWeightHistory();
+                    
+                    // Reload history
+                    loadHistory();
+                })
+                .catch((error) => {
+                    alert('حدث خطأ أثناء حفظ البيانات: ' + error.message);
+                });
+        }
+        
+        // Export today's report
+        function exportTodayReport() {
+            if (!todayData || Object.keys(todayData).length === 0) {
+                alert('لا توجد بيانات لتصديرها اليوم');
+                return;
+            }
+            
+            const selectedDate = entryDate.value;
+            const reportDate = new Date(selectedDate);
+            const dayName = daysInArabic[reportDate.getDay()];
+            
+            let medsTaken = 0;
+            if (todayData.medications) {
+                medsTaken = todayData.medications.filter(m => m.checked).length;
+            }
+            
+            let reportContent = `
+                تقرير نظام الدايت اليومي
+                التاريخ: ${selectedDate} (${dayName})
+                ====================================
+                
+                الوزن: ${todayData.weight || '--'} كجم
+                شرب المياه: ${todayData.water || 0} من 8 أكواب
+                المشي: ${todayData.walking || 0} دقيقة
+                تمرين البلانك: ${todayData.plank || 0} دقيقة
+                الأدوية المأخوذة: ${medsTaken} من 3
+                
+                الوجبات:
+            `;
+            
+            if (todayData.meals && todayData.meals.length > 0) {
+                todayData.meals.forEach(meal => {
+                    reportContent += `\n  - ${meal.description} (${meal.time})`;
+                });
+            } else {
+                reportContent += '\n  لا توجد وجبات مسجلة';
+            }
+            
+            reportContent += '\n\n====================================\n';
+            reportContent += 'نظام الصيام المتقطع: 18 ساعة من الساعة 9 مساءً إلى 3 ظهرًا\n';
+            reportContent += 'تصميم: مهندس بولس سمير';
+            
+            // Create a Blob with the report content
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            // Create a temporary link to download the file
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `تقرير_الصحة_${selectedDate}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            alert('تم تصدير التقرير بنجاح!');
+        }
+        
+        // Export all data
+        function exportAllData() {
+            if (!currentUser) {
+                alert('الرجاء تسجيل الدخول أولاً');
+                return;
+            }
+            
+            const userRef = database.ref('users/' + currentUser.uid);
+            
+            userRef.once('value')
+                .then((snapshot) => {
+                    const userData = snapshot.val();
+                    
+                    if (!userData || !userData.days) {
+                        alert('لا توجد بيانات لتصديرها');
+                        return;
+                    }
+                    
+                    // Convert data to CSV format
+                    let csvContent = 'التاريخ,اليوم,الوزن (كجم),أكواب المياه,دقائق المشي,دقائق البلانك,الأدوية المأخوذة\n';
+                    
+                    const days = userData.days;
+                    Object.keys(days).sort().forEach(date => {
+                        const day = days[date];
+                        
+                        let medsTaken = 0;
+                        if (day.medications) {
+                            medsTaken = day.medications.filter(m => m.checked).length;
+                        }
+                        
+                        csvContent += `${date},${day.day || ''},${day.weight || ''},${day.water || 0},${day.walking || 0},${day.plank || 0},${medsTaken}\n`;
+                    });
+                    
+                    // Create a Blob with the CSV content
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Create a temporary link to download the file
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `بيانات_الصحة_الكاملة.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    alert('تم تصدير جميع البيانات بنجاح!');
+                })
+                .catch((error) => {
+                    alert('حدث خطأ أثناء تصدير البيانات: ' + error.message);
+                });
+        }
+        
+        // Reset form to default values
+        function resetForm() {
+            weightInput.value = '';
+            waterInput.value = 0;
+            walkingInput.value = '';
+            plankInput.value = '';
+            mealTimeInput.value = '';
+            mealDescription.value = '';
+            
+            medications.forEach(med => med.checked = false);
+            renderMedications();
+            
+            mealsList.innerHTML = '';
+            
+            currentWeightDisplay.textContent = '--';
+            walkingDisplay.textContent = '--';
+            plankDisplay.textContent = '--';
+            
+            todayWeightStat.textContent = '--';
+            todayWaterStat.textContent = '0/8';
+            todayWalkStat.textContent = '--';
+            todayPlankStat.textContent = '--';
+            
+            updateWaterDisplay();
+            weightProgress.style.width = '0%';
         }
     </script>
 </body>
