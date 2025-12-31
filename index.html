@@ -3,343 +3,735 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مراقب الرشاقة 2026</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>رفيق العافية | تتبع صحتك اليومي</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Tajawal) -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; }
-        #loading-overlay { transition: opacity 0.4s ease; }
-        .hidden-loader { opacity: 0; pointer-events: none; }
+        :root {
+            --primary-color: #10b981; /* Emerald Green */
+            --secondary-color: #3b82f6; /* Blue */
+            --accent-color: #f59e0b; /* Amber */
+            --danger-color: #ef4444;
+            --dark-bg: #111827;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --bg-color: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 80px; /* For mobile nav if needed */
+        }
+
+        /* Utility Classes & Animations */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-header-custom {
+            background: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Fasting Section */
+        .fasting-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+        }
+        
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Water Tracker */
+        .water-cup {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #dbeafe;
+        }
+        .water-cup.filled {
+            color: #3b82f6;
+            filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+            transform: scale(1.1);
+        }
+
+        /* Forms */
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .btn-primary-custom:hover {
+            background-color: #059669;
+        }
+
+        /* List Items */
+        .list-group-item {
+            border: none;
+            margin-bottom: 8px;
+            border-radius: 8px !important;
+            background-color: #f9fafb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delete-btn {
+            color: #9ca3af;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            color: var(--danger-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timer-display { font-size: 2rem; }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen pb-12">
+<body>
 
-    <!-- شاشة التحميل الذكية -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center text-center px-6">
-        <div class="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
-        <p class="text-slate-600 font-bold text-lg">جارِ تشغيل النظام...</p>
-    </div>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg glass-panel sticky-top mb-4 m-3">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-success" href="#">
+                <i class="fas fa-heart-pulse me-2"></i> رفيق العافية
+            </a>
+            <span class="navbar-text ms-auto fw-bold" id="currentDate"></span>
+            <button class="btn btn-sm btn-outline-danger ms-2" onclick="clearAllData()">
+                <i class="fas fa-trash"></i> تصفير
+            </button>
+        </div>
+    </nav>
 
-    <!-- التنبيهات -->
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[150] bg-green-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 opacity-0 pointer-events-none transition-opacity duration-300">
-        <i class="fas fa-check-circle"></i>
-        <span id="toast-msg">تم الحفظ</span>
-    </div>
-
-    <div class="max-w-5xl mx-auto p-4 md:p-8">
-        <header class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-            <div>
-                <h1 class="text-3xl font-black text-blue-600">مراقب الرشاقة 2026 🚀</h1>
-                <div class="flex items-center gap-2 text-slate-500 mt-1">
-                    <i id="sync-icon" class="fas fa-circle-notch animate-spin"></i>
-                    <span id="sync-status" class="text-xs font-medium">التحقق من الاتصال...</span>
-                </div>
-            </div>
-
-            <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
-                <button onclick="changeDate(-1)" class="p-2 hover:bg-slate-50 rounded-xl text-slate-400"><i class="fas fa-chevron-right"></i></button>
-                <div class="flex items-center gap-2 px-4 border-x border-slate-100">
-                    <i class="fas fa-calendar-alt text-blue-500"></i>
-                    <input type="date" id="date-picker" class="font-bold bg-transparent border-none focus:ring-0 outline-none">
-                </div>
-                <button onclick="changeDate(1)" class="p-2 hover:bg-slate-50 rounded-xl text-slate-400"><i class="fas fa-chevron-left"></i></button>
-            </div>
-        </header>
-
-        <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 space-y-6">
-                <!-- ملخص البيانات -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <h2 class="text-xl font-bold flex items-center gap-2 mb-6"><i class="fas fa-chart-line text-blue-500"></i> ملخص اليوم</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="bg-slate-50 p-4 rounded-2xl text-center">
-                            <p class="text-slate-500 text-xs mb-1">الوزن الحالي</p>
-                            <span id="val-weight" class="text-3xl font-black">--</span> <span class="text-xs text-slate-400">كجم</span>
+    <div class="container">
+        
+        <!-- SECTION 1: Intermittent Fasting (The Hero) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card glass-panel fasting-card p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h3 class="mb-3"><i class="fas fa-stopwatch ms-2"></i>نظام الصيام المتقطع (16:8)</h3>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label text-white-50 small">آخر وجبة (أمس/اليوم)</label>
+                                    <input type="time" class="form-control" id="lastMealTime" onchange="calculateFasting()">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-white-50 small">موعد الفطار المتوقع</label>
+                                    <div class="form-control bg-white text-dark fw-bold" id="nextMealTimeDisplay">--:--</div>
+                                </div>
+                            </div>
+                            <p class="mt-3 mb-0 small text-white-50" id="fastingStatusText">أدخل وقت آخر وجبة لحساب نافذة الصيام.</p>
                         </div>
-                        <div class="bg-blue-50 p-4 rounded-2xl text-center text-blue-600">
-                            <p class="text-xs mb-1">شرب المياه</p>
-                            <span id="val-water" class="text-3xl font-black">0</span> <span class="text-xs">لتر</span>
-                        </div>
-                        <div class="bg-emerald-50 p-4 rounded-2xl text-center text-emerald-600">
-                            <p class="text-xs mb-1">دقائق المشي</p>
-                            <span id="val-steps" class="text-3xl font-black">0</span> <span class="text-xs">دقيقة</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-4 justify-center">
-                        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-                            <input type="number" id="input-weight" placeholder="الوزن.." class="bg-transparent border-none w-20 px-2 outline-none text-center">
-                            <button onclick="updateWeight()" class="bg-blue-600 text-white p-2 rounded-lg"><i class="fas fa-plus"></i></button>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="adjustWater(0.25)" class="bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-bold">+ ماء</button>
-                            <button onclick="adjustSteps(5)" class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl font-bold">+ مشي</button>
+                        <div class="col-md-6 text-center">
+                            <div class="timer-box">
+                                <span class="d-block text-white-50 small">الوقت المتبقي للأكل</span>
+                                <div class="timer-display" id="countdownTimer">00:00:00</div>
+                                <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.2);">
+                                    <div class="progress-bar bg-white" id="fastingProgressBar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <span class="badge bg-white text-success mt-2 p-2 rounded-pill" id="fastingBadge">حالة الصيام</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- السجل التاريخي -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <h2 class="text-xl font-bold mb-4"><i class="fas fa-history text-blue-500"></i> آخر القياسات</h2>
-                    <div id="history-list" class="space-y-3"></div>
+        <div class="row g-4">
+            <!-- SECTION 2: Water Tracker -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card glass-panel h-100">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <span>شرب المياه</span>
+                        </div>
+                        <span class="badge bg-primary rounded-pill" id="waterCountBadge">0 / 8</span>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3 d-flex flex-wrap justify-content-center gap-2" id="waterCupsContainer">
+                            <!-- Cups will be generated by JS -->
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <button class="btn btn-outline-primary rounded-circle" onclick="updateWater(-1)"><i class="fas fa-minus"></i></button>
+                            <h4 class="mb-0 text-primary fw-bold"><span id="waterLiters">0</span> لتر</h4>
+                            <button class="btn btn-primary rounded-circle" onclick="updateWater(1)"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <p class="text-muted small mt-2">الهدف: 8 أكواب (2 لتر)</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <!-- عداد الصيام المطور -->
-                <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
-                    <h2 class="text-xl font-bold text-orange-400 mb-6 flex items-center gap-2"><i class="fas fa-stopwatch"></i> نظام الصيام</h2>
-                    
-                    <div id="fasting-setup">
-                        <label class="text-xs text-slate-400 block mb-3">حدد هدف ساعات الصيام:</label>
-                        <div class="grid grid-cols-4 gap-2 mb-6">
-                            <button onclick="setFastingGoal(12)" class="goal-btn py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">12س</button>
-                            <button onclick="setFastingGoal(16)" class="goal-btn py-2 rounded-xl text-xs font-bold bg-orange-500 text-white">16س</button>
-                            <button onclick="setFastingGoal(18)" class="goal-btn py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">18س</button>
-                            <button onclick="setFastingGoal(20)" class="goal-btn py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400">20س</button>
+            <!-- SECTION 3: Food Tracker -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card glass-panel h-100">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <span>سجل الوجبات</span>
                         </div>
-                        <button onclick="startFasting()" class="w-full py-4 bg-orange-500 hover:bg-orange-600 rounded-2xl font-bold transition-all shadow-lg active:scale-95">
-                            ابدأ الصيام الآن
+                        <button class="btn btn-sm btn-light text-warning" data-bs-toggle="modal" data-bs-target="#addMealModal">
+                            <i class="fas fa-plus"></i>
                         </button>
                     </div>
-
-                    <div id="fasting-active" class="hidden space-y-6 text-center">
-                        <div>
-                            <p class="text-slate-400 text-xs mb-1 italic">أنت صائم منذ:</p>
-                            <p id="fasting-timer" class="text-3xl font-black text-orange-400">00:00:00</p>
-                        </div>
-                        
-                        <!-- شريط التقدم -->
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                            <div id="fasting-progress-bar" class="h-full bg-orange-500 transition-all duration-1000" style="width: 0%"></div>
-                        </div>
-
-                        <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
-                            <p class="text-slate-400 text-[10px] mb-1">موعد الإفطار المتوقع</p>
-                            <p id="fasting-end-time" class="text-xl font-black text-green-400">--:--</p>
-                        </div>
-
-                        <button onclick="stopFasting()" class="w-full py-2 border border-slate-700 hover:bg-slate-800 rounded-xl text-[10px] text-slate-400 transition-colors">
-                            إنهاء الصيام مبكراً
-                        </button>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush p-3" id="mealList">
+                            <!-- Meals List -->
+                            <li class="text-center text-muted py-4 small">لم يتم تسجيل وجبات اليوم</li>
+                        </ul>
                     </div>
                 </div>
+            </div>
 
-                <div class="bg-white p-4 rounded-2xl border border-slate-100">
-                    <button onclick="confirmReset()" class="w-full text-red-500 text-xs font-bold py-2">مسح كافة البيانات</button>
+            <!-- SECTION 4: Activity (Walk & Exercise) -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card glass-panel h-100">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-danger bg-opacity-10 text-danger">
+                                <i class="fas fa-person-walking"></i>
+                            </div>
+                            <span>النشاط والحركة</span>
+                        </div>
+                        <button class="btn btn-sm btn-light text-danger" data-bs-toggle="modal" data-bs-target="#addActivityModal">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-6 border-end">
+                                <h5 class="fw-bold text-danger mb-0" id="totalSteps">0</h5>
+                                <small class="text-muted">خطوة (تقريباً)</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="fw-bold text-danger mb-0" id="totalExerciseTime">0</h5>
+                                <small class="text-muted">دقيقة تمرين</small>
+                            </div>
+                        </div>
+                        <ul class="list-group list-group-flush small" id="activityList">
+                            <!-- Activities -->
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </main>
+
+            <!-- SECTION 5: Medication -->
+            <div class="col-12">
+                <div class="card glass-panel">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box bg-info bg-opacity-10 text-info">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <span>الأدوية والفيتامينات</span>
+                        </div>
+                        <button class="btn btn-sm btn-light text-info" data-bs-toggle="modal" data-bs-target="#addMedModal">
+                            <i class="fas fa-plus"></i> إضافة
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2" id="medicationList">
+                            <!-- Meds Cards -->
+                            <div class="col-12 text-center text-muted">لا توجد أدوية مسجلة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    <!-- Modals -->
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDkqqU_3KbEW_FFFK-Sy8QASI0-jsAfycM",
-            authDomain: "health-ea6cd.firebaseapp.com",
-            projectId: "health-ea6cd",
-            storageBucket: "health-ea6cd.firebasestorage.app",
-            messagingSenderId: "836059005460",
-            appId: "1:836059005460:web:9d3768d1925288322e9d01"
+    <!-- Add Meal Modal -->
+    <div class="modal fade" id="addMealModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">تسجيل وجبة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">اسم الوجبة</label>
+                        <input type="text" class="form-control" id="mealNameInput" placeholder="مثال: فطار - بيض وخبز">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوقت</label>
+                        <input type="time" class="form-control" id="mealTimeInput">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">السعرات (اختياري)</label>
+                        <input type="number" class="form-control" id="mealCalInput" placeholder="كالوري">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary-custom w-100" onclick="saveMeal()">حفظ الوجبة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Activity Modal -->
+    <div class="modal fade" id="addActivityModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">تسجيل نشاط</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pills-walk-tab" data-bs-toggle="pill" data-bs-target="#pills-walk" type="button">مشي</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-exercise-tab" data-bs-toggle="pill" data-bs-target="#pills-exercise" type="button">تمرين</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade show active" id="pills-walk">
+                            <div class="mb-3">
+                                <label class="form-label">عدد الخطوات</label>
+                                <input type="number" class="form-control" id="stepsInput" placeholder="مثال: 3000">
+                            </div>
+                            <button class="btn btn-primary-custom w-100" onclick="saveActivity('walk')">تسجيل المشي</button>
+                        </div>
+                        <div class="tab-pane fade" id="pills-exercise">
+                            <div class="mb-3">
+                                <label class="form-label">نوع التمرين</label>
+                                <input type="text" class="form-control" id="exerciseName" placeholder="مثال: جيم، سباحة">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">المدة (دقيقة)</label>
+                                <input type="number" class="form-control" id="exerciseDuration" placeholder="30">
+                            </div>
+                            <button class="btn btn-primary-custom w-100" onclick="saveActivity('exercise')">تسجيل التمرين</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Med Modal -->
+    <div class="modal fade" id="addMedModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة دواء</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">اسم الدواء</label>
+                        <input type="text" class="form-control" id="medNameInput">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوقت المفروض</label>
+                        <input type="time" class="form-control" id="medTimeInput">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary-custom w-100" onclick="saveMed()">حفظ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Data Structure
+        let appData = {
+            lastMeal: null, // timestamp string
+            waterCount: 0,
+            meals: [],
+            activities: [],
+            meds: []
         };
 
-        let db, auth;
-        let currentUser = null;
-        let globalData = JSON.parse(localStorage.getItem('health_data_v3')) || { 
-            settings: { weightHistory: [], fastingGoal: 16 }, 
-            records: {} 
-        };
-        let selectedDate = new Date().toISOString().split('T')[0];
-        let isCloudMode = false;
-
-        const forceLoad = () => {
-            const loader = document.getElementById('loading-overlay');
-            if (loader) loader.classList.add('hidden-loader');
-            updateUI();
-            document.getElementById('sync-icon').className = "fas fa-hdd text-amber-500";
-            document.getElementById('sync-status').innerText = "وضع الحفظ المحلي نشط";
-        };
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            const authTimeout = setTimeout(forceLoad, 1500);
-
-            signInAnonymously(auth).catch(() => forceLoad());
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    clearTimeout(authTimeout);
-                    currentUser = user;
-                    isCloudMode = true;
-                    document.getElementById('sync-icon').className = "fas fa-cloud text-green-500";
-                    document.getElementById('sync-status').innerText = "متصل سحابياً";
-                    syncData();
-                }
-            });
-        } catch (e) {
-            forceLoad();
-        }
-
-        function syncData() {
-            const docRef = doc(db, 'artifacts', 'health-2026', 'users', currentUser.uid, 'data', 'main');
-            onSnapshot(docRef, (snap) => {
-                if (snap.exists()) {
-                    globalData = snap.data();
-                    localStorage.setItem('health_data_v3', JSON.stringify(globalData));
-                }
-                updateUI();
-                forceLoad();
-            }, () => forceLoad());
-        }
-
-        function updateUI() {
-            const day = globalData.records[selectedDate] || { water: 0, steps: 0, weight: null };
-            document.getElementById('val-weight').innerText = day.weight || '--';
-            document.getElementById('val-water').innerText = day.water || 0;
-            document.getElementById('val-steps').innerText = day.steps || 0;
-            document.getElementById('date-picker').value = selectedDate;
-
-            // تحديث واجهة الصيام
-            if (day.fastingStart) {
-                document.getElementById('fasting-setup').classList.add('hidden');
-                document.getElementById('fasting-active').classList.remove('hidden');
-                runTimer(day.fastingStart);
-            } else {
-                document.getElementById('fasting-setup').classList.remove('hidden');
-                document.getElementById('fasting-active').classList.add('hidden');
-                updateGoalButtons(globalData.settings.fastingGoal || 16);
-            }
-            renderHistory();
-        }
-
-        function updateGoalButtons(goal) {
-            document.querySelectorAll('.goal-btn').forEach(btn => {
-                const isSelected = parseInt(btn.innerText) === goal;
-                btn.classList.toggle('bg-orange-500', isSelected);
-                btn.classList.toggle('text-white', isSelected);
-                btn.classList.toggle('bg-slate-800', !isSelected);
-                btn.classList.toggle('text-slate-400', !isSelected);
-            });
-        }
-
-        function renderHistory() {
-            const hist = globalData.settings.weightHistory || [];
-            const container = document.getElementById('history-list');
-            container.innerHTML = hist.length ? '' : '<p class="text-center text-slate-400 text-xs py-4">لا توجد بيانات مسجلة</p>';
-            [...hist].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 3).forEach(item => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <span class="text-xs font-bold text-slate-500">${item.date}</span>
-                        <span class="font-black text-blue-600">${item.value} كجم</span>
-                    </div>`;
-            });
-        }
-
-        function runTimer(startStr) {
-            const start = new Date(startStr);
-            const goalHours = globalData.settings.fastingGoal || 16;
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initDate();
+            renderWater();
+            renderMeals();
+            renderActivities();
+            renderMeds();
             
-            // حساب وقت الإفطار
-            const end = new Date(start.getTime() + goalHours * 3600000);
-            document.getElementById('fasting-end-time').innerText = end.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            // Start Timer Loop
+            setInterval(updateFastingTimer, 1000);
+            
+            // Set current time inputs default
+            const now = new Date();
+            const timeString = now.toTimeString().substring(0,5);
+            document.getElementById('mealTimeInput').value = timeString;
+            document.getElementById('medTimeInput').value = timeString;
+        });
 
-            const update = () => {
-                const now = new Date();
-                const diff = now - start;
-                
-                // تحديث العداد
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('fasting-timer').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                
-                // تحديث شريط التقدم
-                const progress = Math.min(100, (diff / (goalHours * 3600000)) * 100);
-                document.getElementById('fasting-progress-bar').style.width = progress + '%';
-                
-                if (document.getElementById('fasting-active').offsetParent) setTimeout(update, 1000);
-            };
-            update();
+        function initDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', calendar: 'gregory' };
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-EG', options);
         }
 
-        // الأفعال (Actions)
-        window.setFastingGoal = (h) => {
-            globalData.settings.fastingGoal = h;
-            updateGoalButtons(h);
-            saveData();
-        };
+        // --- LOCAL STORAGE HANDLING ---
+        function saveData() {
+            localStorage.setItem('wellnessAppData', JSON.stringify(appData));
+        }
 
-        window.changeDate = (val) => {
-            let d = new Date(selectedDate); d.setDate(d.getDate() + val);
-            selectedDate = d.toISOString().split('T')[0]; updateUI();
-        };
-
-        window.updateWeight = async () => {
-            const val = parseFloat(document.getElementById('input-weight').value);
-            if (!val) return;
-            if (!globalData.records[selectedDate]) globalData.records[selectedDate] = { water: 0, steps: 0 };
-            globalData.records[selectedDate].weight = val;
-            globalData.settings.weightHistory = globalData.settings.weightHistory.filter(h => h.date !== selectedDate);
-            globalData.settings.weightHistory.push({ date: selectedDate, value: val });
-            document.getElementById('input-weight').value = '';
-            await saveData();
-        };
-
-        window.adjustWater = async (v) => {
-            if (!globalData.records[selectedDate]) globalData.records[selectedDate] = { water: 0, steps: 0 };
-            globalData.records[selectedDate].water = Math.max(0, (globalData.records[selectedDate].water || 0) + v);
-            await saveData();
-        };
-
-        window.adjustSteps = async (v) => {
-            if (!globalData.records[selectedDate]) globalData.records[selectedDate] = { water: 0, steps: 0 };
-            globalData.records[selectedDate].steps = Math.max(0, (globalData.records[selectedDate].steps || 0) + v);
-            await saveData();
-        };
-
-        window.startFasting = async () => {
-            if (!globalData.records[selectedDate]) globalData.records[selectedDate] = { water: 0, steps: 0 };
-            globalData.records[selectedDate].fastingStart = new Date().toISOString();
-            await saveData();
-        };
-
-        window.stopFasting = async () => {
-            globalData.records[selectedDate].fastingStart = null;
-            await saveData();
-        };
-
-        async function saveData() {
-            localStorage.setItem('health_data_v3', JSON.stringify(globalData));
-            updateUI();
-            if (isCloudMode && currentUser) {
-                try {
-                    await setDoc(doc(db, 'artifacts', 'health-2026', 'users', currentUser.uid, 'data', 'main'), globalData);
-                } catch (e) { console.error("Cloud save failed"); }
+        function loadData() {
+            const saved = localStorage.getItem('wellnessAppData');
+            if (saved) {
+                appData = JSON.parse(saved);
+                // Set Fasting Input if exists
+                if(appData.lastMeal) {
+                    // Extract time part for input
+                    const date = new Date(appData.lastMeal);
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    document.getElementById('lastMealTime').value = `${hours}:${minutes}`;
+                    calculateFasting(); // run initial calculation
+                }
             }
-            showToast();
         }
 
-        function showToast() {
-            const t = document.getElementById('toast');
-            t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000);
-        }
-
-        window.confirmReset = () => {
-            if(confirm("سيتم حذف كل شيء، هل أنت متأكد؟")) {
-                localStorage.removeItem('health_data_v3');
+        function clearAllData() {
+            if(confirm('هل أنت متأكد من مسح جميع البيانات؟')) {
+                localStorage.removeItem('wellnessAppData');
                 location.reload();
             }
-        };
+        }
 
-        document.getElementById('date-picker').addEventListener('change', (e) => {
-            selectedDate = e.target.value; updateUI();
-        });
+        // --- FASTING LOGIC (16:8) ---
+        function calculateFasting() {
+            const inputTime = document.getElementById('lastMealTime').value;
+            if (!inputTime) return;
+
+            const now = new Date();
+            let lastMealDate = new Date();
+            const [hours, minutes] = inputTime.split(':');
+            lastMealDate.setHours(hours, minutes, 0, 0);
+
+            // If input time is in future compared to now, assume it was yesterday
+            if (lastMealDate > now) {
+                lastMealDate.setDate(lastMealDate.getDate() - 1);
+            }
+
+            appData.lastMeal = lastMealDate.toISOString();
+            saveData();
+            updateFastingTimer();
+        }
+
+        function updateFastingTimer() {
+            if (!appData.lastMeal) return;
+
+            const lastMealDate = new Date(appData.lastMeal);
+            const fastingDuration = 16 * 60 * 60 * 1000; // 16 hours in ms
+            const nextMealDate = new Date(lastMealDate.getTime() + fastingDuration);
+            const now = new Date();
+
+            // Display Next Meal Time
+            const nextTimeStr = nextMealDate.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('nextMealTimeDisplay').innerText = nextTimeStr;
+
+            const diff = nextMealDate - now;
+
+            const timerDisplay = document.getElementById('countdownTimer');
+            const statusBadge = document.getElementById('fastingBadge');
+            const statusText = document.getElementById('fastingStatusText');
+            const progressBar = document.getElementById('fastingProgressBar');
+
+            if (diff > 0) {
+                // Still fasting
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                timerDisplay.innerText = `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+                statusBadge.className = 'badge bg-warning text-dark mt-2 p-2 rounded-pill';
+                statusBadge.innerText = 'صائم الآن 🔥';
+                statusText.innerText = 'جسمك يقوم بحرق الدهون الآن!';
+                
+                // Progress
+                const totalSeconds = 16 * 3600;
+                const elapsedSeconds = (now - lastMealDate) / 1000;
+                const percentage = Math.min(100, (elapsedSeconds / totalSeconds) * 100);
+                progressBar.style.width = `${percentage}%`;
+                progressBar.classList.remove('bg-success');
+                progressBar.classList.add('bg-white');
+
+            } else {
+                // Fasting finished
+                timerDisplay.innerText = "00:00:00";
+                statusBadge.className = 'badge bg-white text-success mt-2 p-2 rounded-pill';
+                statusBadge.innerText = 'وقت الأكل 🍽️';
+                statusText.innerText = 'يمكنك تناول وجبتك الآن، بالهنا والشفا.';
+                progressBar.style.width = '100%';
+            }
+        }
+
+        // --- WATER TRACKER ---
+        function updateWater(amount) {
+            appData.waterCount += amount;
+            if (appData.waterCount < 0) appData.waterCount = 0;
+            if (appData.waterCount > 12) appData.waterCount = 12; // Max limit visual
+            saveData();
+            renderWater();
+        }
+
+        function renderWater() {
+            const container = document.getElementById('waterCupsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= 8; i++) {
+                const icon = document.createElement('i');
+                icon.className = `fas fa-glass-water fa-2x water-cup ${i <= appData.waterCount ? 'filled' : ''}`;
+                icon.onclick = () => {
+                    appData.waterCount = i;
+                    saveData();
+                    renderWater();
+                };
+                container.appendChild(icon);
+            }
+
+            document.getElementById('waterCountBadge').innerText = `${appData.waterCount} / 8`;
+            document.getElementById('waterLiters').innerText = (appData.waterCount * 0.25).toFixed(2);
+        }
+
+        // --- MEALS LOGIC ---
+        function saveMeal() {
+            const name = document.getElementById('mealNameInput').value;
+            const time = document.getElementById('mealTimeInput').value;
+            const cal = document.getElementById('mealCalInput').value;
+
+            if(!name || !time) return alert('الرجاء إدخال اسم الوجبة والوقت');
+
+            appData.meals.push({ id: Date.now(), name, time, cal });
+            // Sort by time
+            appData.meals.sort((a,b) => a.time.localeCompare(b.time));
+            
+            saveData();
+            renderMeals();
+            
+            // Clear inputs and close modal
+            document.getElementById('mealNameInput').value = '';
+            document.getElementById('mealCalInput').value = '';
+            bootstrap.Modal.getInstance(document.getElementById('addMealModal')).hide();
+        }
+
+        function deleteMeal(id) {
+            appData.meals = appData.meals.filter(m => m.id !== id);
+            saveData();
+            renderMeals();
+        }
+
+        function renderMeals() {
+            const list = document.getElementById('mealList');
+            list.innerHTML = '';
+            
+            if (appData.meals.length === 0) {
+                list.innerHTML = '<li class="text-center text-muted py-4 small">لم يتم تسجيل وجبات اليوم</li>';
+                return;
+            }
+
+            appData.meals.forEach(meal => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `
+                    <div>
+                        <span class="badge bg-warning text-dark me-2">${formatTime(meal.time)}</span>
+                        <strong>${meal.name}</strong>
+                        ${meal.cal ? `<small class="text-muted ms-1">(${meal.cal} cal)</small>` : ''}
+                    </div>
+                    <i class="fas fa-times delete-btn" onclick="deleteMeal(${meal.id})"></i>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // --- ACTIVITY LOGIC ---
+        function saveActivity(type) {
+            if (type === 'walk') {
+                const steps = document.getElementById('stepsInput').value;
+                if(!steps) return;
+                appData.activities.push({ id: Date.now(), type: 'walk', val: parseInt(steps), label: 'مشي' });
+                document.getElementById('stepsInput').value = '';
+            } else {
+                const name = document.getElementById('exerciseName').value;
+                const duration = document.getElementById('exerciseDuration').value;
+                if(!name || !duration) return;
+                appData.activities.push({ id: Date.now(), type: 'exercise', val: parseInt(duration), label: name });
+                document.getElementById('exerciseName').value = '';
+                document.getElementById('exerciseDuration').value = '';
+            }
+            saveData();
+            renderActivities();
+            bootstrap.Modal.getInstance(document.getElementById('addActivityModal')).hide();
+        }
+
+        function deleteActivity(id) {
+            appData.activities = appData.activities.filter(a => a.id !== id);
+            saveData();
+            renderActivities();
+        }
+
+        function renderActivities() {
+            const list = document.getElementById('activityList');
+            list.innerHTML = '';
+            
+            let totalSteps = 0;
+            let totalTime = 0;
+
+            appData.activities.forEach(act => {
+                if(act.type === 'walk') totalSteps += act.val;
+                if(act.type === 'exercise') totalTime += act.val;
+
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                const icon = act.type === 'walk' ? 'fa-shoe-prints' : 'fa-dumbbell';
+                const unit = act.type === 'walk' ? 'خطوة' : 'دقيقة';
+                
+                li.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${icon} text-danger me-2 ms-2 opacity-50"></i>
+                        <span>${act.label}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-danger bg-opacity-10 text-danger ms-2">${act.val} ${unit}</span>
+                        <i class="fas fa-times delete-btn" onclick="deleteActivity(${act.id})"></i>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+
+            document.getElementById('totalSteps').innerText = totalSteps;
+            document.getElementById('totalExerciseTime').innerText = totalTime;
+        }
+
+        // --- MEDICATION LOGIC ---
+        function saveMed() {
+            const name = document.getElementById('medNameInput').value;
+            const time = document.getElementById('medTimeInput').value;
+            
+            if(!name || !time) return;
+
+            appData.meds.push({ id: Date.now(), name, time, taken: false });
+            saveData();
+            renderMeds();
+            
+            document.getElementById('medNameInput').value = '';
+            bootstrap.Modal.getInstance(document.getElementById('addMedModal')).hide();
+        }
+
+        function toggleMed(id) {
+            const med = appData.meds.find(m => m.id === id);
+            if(med) {
+                med.taken = !med.taken;
+                saveData();
+                renderMeds();
+            }
+        }
+
+        function deleteMed(id) {
+            if(confirm('حذف الدواء؟')) {
+                appData.meds = appData.meds.filter(m => m.id !== id);
+                saveData();
+                renderMeds();
+            }
+        }
+
+        function renderMeds() {
+            const container = document.getElementById('medicationList');
+            container.innerHTML = '';
+
+            if (appData.meds.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">لا توجد أدوية مسجلة</div>';
+                return;
+            }
+
+            appData.meds.forEach(med => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6';
+                col.innerHTML = `
+                    <div class="p-2 border rounded d-flex justify-content-between align-items-center ${med.taken ? 'bg-success bg-opacity-10 border-success' : 'bg-white'}">
+                        <div class="d-flex align-items-center">
+                            <input class="form-check-input ms-2" type="checkbox" ${med.taken ? 'checked' : ''} onchange="toggleMed(${med.id})">
+                            <div>
+                                <div class="fw-bold ${med.taken ? 'text-decoration-line-through text-muted' : ''}">${med.name}</div>
+                                <div class="small text-muted"><i class="far fa-clock"></i> ${formatTime(med.time)}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm text-danger" onclick="deleteMed(${med.id})"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Helpers
+        function formatTime(timeStr) {
+            // Convert 24h to 12h Arabic
+            let [h, m] = timeStr.split(':');
+            h = parseInt(h);
+            const ampm = h >= 12 ? 'م' : 'ص';
+            h = h % 12;
+            h = h ? h : 12; 
+            return `${h}:${m} ${ampm}`;
+        }
+
     </script>
 </body>
 </html>
