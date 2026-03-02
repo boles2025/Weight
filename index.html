@@ -3,468 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>رفيق العافية | تتبع صحتك اليومي</title>
+    <title>رفيق العافية | سجل مصغر</title>
     
     <!-- Bootstrap 5 RTL CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <!-- FontAwesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font (Tajawal + Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
         }
 
         body {
-            font-family: 'Tajawal', 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(145deg, #0a0f1e, #141b2b);
             min-height: 100vh;
-            padding: 20px 15px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* خلفية متحركة */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.03)" d="M0 0 L100 100 L0 100 Z"/><path fill="rgba(255,255,255,0.02)" d="M100 0 L0 100 L100 100 Z"/></svg>');
-            background-size: cover;
-            pointer-events: none;
-            z-index: 0;
+            padding: 12px;
         }
 
         .container {
-            position: relative;
-            z-index: 1;
             max-width: 600px;
             margin: 0 auto;
         }
 
-        /* كارت الهيدر بتدرج رهيب */
-        .gradient-header {
-            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+        /* الهيدر */
+        .mini-header {
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 20px 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 25px 40px -15px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,255,0.5);
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .header-content {
+            border-radius: 35px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .app-logo {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .logo-mini {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-mini i {
             font-size: 1.5rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: #4f46e5;
         }
 
-        .app-logo i {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .logo-mini span {
+            font-weight: 800;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 2rem;
         }
 
-        .date-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .date-badge-mini {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             color: white;
-            padding: 8px 20px;
-            border-radius: 50px;
+            padding: 6px 15px;
+            border-radius: 30px;
+            font-size: 0.85rem;
             font-weight: 600;
-            font-size: 0.95rem;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-            animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        /* بطاقات أنيقة مع تدرجات */
-        .fancy-card {
-            background: rgba(255, 255, 255, 0.9);
+        /* البطاقات */
+        .compact-card {
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border-radius: 35px;
-            padding: 22px 20px;
-            margin-bottom: 20px;
-            border: 2px solid rgba(255,255,255,0.6);
-            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.2);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
+            border-radius: 30px;
+            padding: 16px 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .fancy-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-            background-size: 200% 100%;
-            animation: gradientMove 3s linear infinite;
-        }
-
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .fancy-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 30px 50px -15px rgba(102, 126, 234, 0.4);
-        }
-
-        /* عنوان كل قسم */
-        .card-title {
+        .card-title-mini {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 1rem;
             font-weight: 700;
-            color: #2d3748;
+            color: #1e293b;
         }
 
-        .card-title i {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .card-title-mini i {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             color: white;
-            border-radius: 20px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-            animation: rotate 4s linear infinite;
-        }
-
-        @keyframes rotate {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(5deg); }
-            75% { transform: rotate(-5deg); }
+            font-size: 1rem;
         }
 
         /* أزرار الصيام */
-        .fasting-buttons {
+        .fasting-mini-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
-        .fasting-btn {
+        .fasting-mini-btn {
             background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 25px;
-            padding: 12px 5px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #4a5568;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 8px 0;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e293b;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s;
+            text-align: center;
         }
 
-        .fasting-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .fasting-btn:hover::before {
-            left: 100%;
-        }
-
-        .fasting-btn:hover {
-            transform: scale(1.05);
-            border-color: #667eea;
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
-        }
-
-        .fasting-btn.selected {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .fasting-mini-btn.selected {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             border-color: transparent;
             color: white;
-            box-shadow: 0 15px 25px rgba(102, 126, 234, 0.4);
-            animation: selectedPulse 1.5s infinite;
         }
 
-        @keyframes selectedPulse {
-            0%, 100% { box-shadow: 0 15px 25px rgba(102, 126, 234, 0.4); }
-            50% { box-shadow: 0 20px 35px rgba(102, 126, 234, 0.6); }
-        }
-
-        /* حقول الإدخال */
-        .input-glow {
+        /* حقول صغيرة */
+        .input-mini {
             background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 25px;
-            padding: 15px 20px;
-            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 10px 15px;
             width: 100%;
-            transition: all 0.3s;
-            font-family: 'Tajawal', sans-serif;
+            font-size: 0.95rem;
         }
 
-        .input-glow:focus {
+        .input-mini:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2), 0 10px 20px rgba(102, 126, 234, 0.1);
-            transform: scale(1.02);
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* صف المشي والبلانك */
+        .activities-mini-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
         }
 
         /* وقت الإفطار */
-        .breakfast-box {
-            background: linear-gradient(135deg, #f6e05e, #fbbf24);
-            border-radius: 25px;
-            padding: 15px;
+        .breakfast-mini {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 20px;
+            padding: 8px;
             text-align: center;
-            color: #744210;
             font-weight: 700;
-            font-size: 1.4rem;
-            box-shadow: 0 15px 30px rgba(246, 224, 94, 0.3);
-            animation: glow 2s ease-in-out infinite;
+            font-size: 1rem;
+            color: #1e293b;
         }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 15px 30px rgba(246, 224, 94, 0.3); }
-            50% { box-shadow: 0 20px 40px rgba(246, 224, 94, 0.5); }
-        }
-
-        /* زرار الحفظ */
-        .save-btn-modern {
-            background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
-            background-size: 200% 200%;
-            color: white;
+        /* زرار الحفظ الصغير */
+        .save-mini-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
             border: none;
-            border-radius: 50px;
-            padding: 20px;
-            font-size: 1.3rem;
-            font-weight: 800;
+            border-radius: 40px;
+            padding: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
             width: 100%;
-            margin: 20px 0;
-            box-shadow: 0 20px 40px -10px rgba(102, 126, 234, 0.5);
-            animation: gradientShift 3s ease infinite, savePulse 2s infinite;
+            margin: 15px 0;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        @keyframes savePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        .save-btn-modern::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .save-btn-modern:hover::before {
-            left: 100%;
-        }
-
-        /* عناصر السجل */
-        .log-card {
-            background: white;
-            border-radius: 30px;
-            padding: 18px;
-            margin-bottom: 15px;
-            border: 2px solid transparent;
-            background: linear-gradient(white, white) padding-box,
-                        linear-gradient(135deg, #667eea, #764ba2) border-box;
-            animation: slideIn 0.5s ease-out;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .log-card:hover {
-            transform: translateX(-5px) scale(1.02);
-            box-shadow: 0 20px 30px -10px rgba(102, 126, 234, 0.3);
-        }
-
-        .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
             gap: 10px;
+            cursor: pointer;
         }
 
-        .log-date-badge {
-            background: linear-gradient(135deg, #f6e05e, #fbbf24);
-            color: #744210;
-            padding: 8px 18px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.95rem;
+        /* ===== السجل المصغر ===== */
+        .mini-history-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 12px;
+            max-height: 350px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        /* عنصر السجل الواحد - صغير جداً */
+        .mini-history-item {
+            background: white;
+            border-radius: 20px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 8px 15px rgba(246, 224, 94, 0.2);
+            justify-content: space-between;
+            transition: all 0.2s;
+            position: relative;
         }
 
-        .log-actions {
+        .mini-history-item:hover {
+            border-color: #4f46e5;
+            transform: translateX(-2px);
+        }
+
+        /* الجزء الأيمن - التاريخ */
+        .mini-date-box {
             display: flex;
-            gap: 8px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border-radius: 15px;
+            padding: 5px 10px;
+            min-width: 55px;
         }
 
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 15px;
+        .mini-date-day {
+            font-weight: 800;
+            font-size: 1rem;
+            color: #1e293b;
+            line-height: 1;
+        }
+
+        .mini-date-month {
+            font-size: 0.65rem;
+            color: #64748b;
+        }
+
+        /* الإحصائيات المصغرة */
+        .mini-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mini-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .mini-stat i {
+            font-size: 0.8rem;
+            color: #4f46e5;
+        }
+
+        /* فرق الوزن */
+        .weight-diff-mini {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .diff-up {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .diff-down {
+            background: #d1fae5;
+            color: #10b981;
+        }
+
+        /* أزرار التحكم الصغيرة */
+        .mini-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .mini-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s;
             background: white;
-            border: 2px solid #e2e8f0;
-            color: #4a5568;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 0.8rem;
         }
 
-        .icon-btn.edit:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: transparent;
+        .mini-action-btn.edit:hover {
+            background: #4f46e5;
+            border-color: #4f46e5;
             color: white;
-            transform: rotate(180deg) scale(1.1);
         }
 
-        .icon-btn.delete:hover {
-            background: linear-gradient(135deg, #f56565, #ed64a6);
-            border-color: transparent;
+        .mini-action-btn.delete:hover {
+            background: #ef4444;
+            border-color: #ef4444;
             color: white;
-            transform: scale(1.1) rotate(5deg);
         }
 
         /* شريط التحميل */
-        .loading-spinner {
+        .loading-spinner-mini {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+        .spinner-mini {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #4f46e5;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+            animation: spin 1s infinite;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* الأدوية */
-        .meds-badge {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            padding: 6px 15px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-
-        /* تدرج خلفية الأقسام */
-        .gradient-bg {
-            background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
-        }
-
-        /* تحويل الوقت لـ 12 ساعة */
-        .time-12 {
-            direction: ltr;
-            display: inline-block;
+            to { transform: rotate(360deg); }
         }
 
         /* تحسين الموبايل */
-        @media (max-width: 576px) {
-            .fasting-buttons {
-                gap: 5px;
+        @media (max-width: 400px) {
+            .mini-stats {
+                gap: 6px;
             }
-            .fasting-btn {
-                padding: 10px 3px;
-                font-size: 1rem;
+            .mini-stat {
+                font-size: 0.75rem;
             }
-            .header-content {
-                flex-direction: column;
-                gap: 10px;
+            .mini-date-box {
+                min-width: 45px;
+                padding: 3px 5px;
             }
         }
     </style>
@@ -472,136 +348,108 @@
 <body>
 
 <div class="container">
-    <!-- الهيدر المتحرك -->
-    <div class="gradient-header" data-aos="fade-down" data-aos-duration="1000">
-        <div class="header-content">
-            <div class="app-logo">
-                <i class="fas fa-heart-pulse"></i>
-                <span>رفيق العافية</span>
-            </div>
-            <div class="date-badge" id="currentDate">
-                <i class="far fa-calendar-alt ms-2"></i>
-                <span>جاري التحميل...</span>
-            </div>
+    <!-- هيدر صغير -->
+    <div class="mini-header">
+        <div class="logo-mini">
+            <i class="fas fa-heart-pulse"></i>
+            <span>رفيق العافية</span>
+        </div>
+        <div class="date-badge-mini" id="currentDate">
+            <i class="far fa-calendar-alt ms-1"></i>
+            <span>جاري</span>
         </div>
     </div>
 
     <!-- اختيار التاريخ -->
-    <div class="fancy-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="card-title">
+    <div class="compact-card">
+        <div class="card-title-mini">
             <i class="fas fa-calendar-day"></i>
-            <span>اختر يومك</span>
+            <span>اختر اليوم</span>
         </div>
-        <input type="date" class="input-glow" id="selectedDate" value="">
+        <input type="date" class="input-mini" id="selectedDate" value="">
     </div>
 
     <!-- الصيام المتقطع -->
-    <div class="fancy-card" data-aos="fade-up" data-aos-delay="200">
-        <div class="card-title">
+    <div class="compact-card">
+        <div class="card-title-mini">
             <i class="fas fa-hourglass-half"></i>
             <span>نظام الصيام</span>
         </div>
         
-        <div class="fasting-buttons">
-            <div class="fasting-btn" data-hours="12" onclick="selectFasting(12)">12</div>
-            <div class="fasting-btn" data-hours="16" onclick="selectFasting(16)">16</div>
-            <div class="fasting-btn" data-hours="18" onclick="selectFasting(18)">18</div>
-            <div class="fasting-btn" data-hours="20" onclick="selectFasting(20)">20</div>
+        <div class="fasting-mini-grid">
+            <div class="fasting-mini-btn" data-hours="12" onclick="selectFasting(12)">12</div>
+            <div class="fasting-mini-btn" data-hours="16" onclick="selectFasting(16)">16</div>
+            <div class="fasting-mini-btn" data-hours="18" onclick="selectFasting(18)">18</div>
+            <div class="fasting-mini-btn" data-hours="20" onclick="selectFasting(20)">20</div>
         </div>
         
-        <div class="row g-3">
-            <div class="col-6">
-                <label class="text-muted small mb-1">⏰ آخر وجبة</label>
-                <input type="time" class="input-glow" id="lastMealTime" onchange="calculateBreakfast()">
+        <div class="row g-2">
+            <div class="col-7">
+                <label class="text-muted small mb-1">آخر وجبة</label>
+                <input type="time" class="input-mini" id="lastMealTime" onchange="calculateBreakfast()">
             </div>
-            <div class="col-6">
-                <label class="text-muted small mb-1">🍽️ هتفطر الساعة</label>
-                <div class="breakfast-box" id="breakfastTime">--:-- --</div>
+            <div class="col-5">
+                <label class="text-muted small mb-1">الإفطار</label>
+                <div class="breakfast-mini" id="breakfastTime">--:--</div>
             </div>
         </div>
     </div>
 
-    <!-- القياسات -->
-    <div class="fancy-card" data-aos="fade-up" data-aos-delay="300">
-        <div class="card-title">
+    <!-- القياسات الأساسية -->
+    <div class="compact-card">
+        <div class="card-title-mini">
             <i class="fas fa-weight-scale"></i>
             <span>القياسات</span>
         </div>
         
-        <div class="row g-3">
+        <div class="row g-2">
             <div class="col-6">
-                <label class="text-muted small mb-1">⚖️ الوزن (كجم)</label>
-                <input type="number" step="0.1" class="input-glow" id="weightInput" placeholder="مثال: 75.5">
+                <input type="number" step="0.1" class="input-mini" id="weightInput" placeholder="الوزن (كجم)">
             </div>
             <div class="col-6">
-                <label class="text-muted small mb-1">📏 محيط البطن (سم)</label>
-                <input type="number" step="0.5" class="input-glow" id="bellyInput" placeholder="مثال: 85">
+                <input type="number" step="0.5" class="input-mini" id="bellyInput" placeholder="محيط البطن (سم)">
             </div>
         </div>
     </div>
 
-    <!-- الأنشطة -->
-    <div class="fancy-card" data-aos="fade-up" data-aos-delay="400">
-        <div class="card-title">
+    <!-- المشي والبلانك -->
+    <div class="compact-card">
+        <div class="card-title-mini">
             <i class="fas fa-person-running"></i>
-            <span>الأنشطة</span>
+            <span>الأنشطة (بالدقائق)</span>
         </div>
         
-        <div class="row g-3">
-            <div class="col-4">
-                <label class="text-muted small mb-1">🚶 المشي (دق)</label>
-                <input type="number" class="input-glow" id="walkInput" placeholder="0">
+        <div class="activities-mini-row">
+            <div>
+                <label class="text-muted small mb-1">🚶 المشي</label>
+                <input type="number" class="input-mini" id="walkInput" placeholder="دقيقة">
             </div>
-            <div class="col-4">
-                <label class="text-muted small mb-1">🧘 البلانك (دق)</label>
-                <input type="number" class="input-glow" id="plankInput" placeholder="0">
-            </div>
-            <div class="col-4">
-                <label class="text-muted small mb-1">💧 المياه (كوب)</label>
-                <input type="number" class="input-glow" id="waterInput" placeholder="0">
+            <div>
+                <label class="text-muted small mb-1">🧘 البلانك</label>
+                <input type="number" class="input-mini" id="plankInput" placeholder="دقيقة">
             </div>
         </div>
     </div>
 
-    <!-- الأدوية -->
-    <div class="fancy-card" data-aos="fade-up" data-aos-delay="500">
-        <div class="card-title">
-            <i class="fas fa-pills"></i>
-            <span>الأدوية</span>
-        </div>
-        
-        <div class="d-flex flex-wrap align-items-center gap-3">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="medsCheckbox" style="transform: scale(1.2);">
-                <label class="form-check-label fw-bold" for="medsCheckbox">
-                    فيه أدوية اليوم؟
-                </label>
-            </div>
-            <div class="flex-grow-1" id="medsDetails" style="display: none;">
-                <input type="text" class="input-glow" id="medsNames" placeholder="اكتب أسماء الأدوية">
-            </div>
-        </div>
-    </div>
-
-    <!-- زر الحفظ الرهيب -->
-    <button class="save-btn-modern" onclick="saveDailyData()" data-aos="zoom-in" data-aos-delay="600">
-        <i class="fas fa-cloud-sun fa-2x"></i>
-        <span>احفظ اليوم</span>
-        <i class="fas fa-heart" style="animation: heartbeat 1.5s infinite;"></i>
+    <!-- زر الحفظ -->
+    <button class="save-mini-btn" onclick="saveDailyData()">
+        <i class="fas fa-cloud-sun"></i>
+        <span>حفظ اليوم</span>
+        <i class="fas fa-check-circle"></i>
     </button>
 
-    <!-- السجل اليومي -->
-    <div class="fancy-card" data-aos="fade-up" data-aos-delay="700">
-        <div class="card-title">
+    <!-- ===== السجل المصغر ===== -->
+    <div class="compact-card" style="padding: 10px;">
+        <div class="card-title-mini">
             <i class="fas fa-history"></i>
-            <span>سجل التطور اليومي</span>
+            <span>السجل اليومي (آخر 30 يوم)</span>
         </div>
         
-        <div id="historyList">
+        <div class="mini-history-container" id="historyList">
             <!-- السجل هنا -->
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-                <p class="text-muted">جاري تحميل السجل...</p>
+            <div class="loading-spinner-mini">
+                <div class="spinner-mini"></div>
+                <p class="text-muted small">جاري التحميل...</p>
             </div>
         </div>
     </div>
@@ -610,16 +458,8 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<!-- AOS Animation -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
-    // تهيئة AOS
-    AOS.init({
-        duration: 1000,
-        once: true
-    });
-
     // -------------------- Firebase Config --------------------
     const firebaseConfig = {
         apiKey: "AIzaSyBfeAaczyuh6LCAXmIYKvW-Q_toNtjsTME",
@@ -638,31 +478,21 @@
     let selectedFasting = 16;
     let currentDate = new Date().toISOString().split('T')[0];
     
-    // تعيين التاريخ الحالي
     document.getElementById('selectedDate').value = currentDate;
     
-    // عرض التاريخ بالعربية
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    // عرض التاريخ
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
     document.getElementById('currentDate').innerHTML = `
-        <i class="far fa-calendar-alt ms-2"></i>
+        <i class="far fa-calendar-alt ms-1"></i>
         ${new Date().toLocaleDateString('ar-EG', options)}
     `;
 
-    // -------------------- دوال تحويل الوقت --------------------
+    // -------------------- دوال الوقت --------------------
     function formatTo12Hour(time24) {
-        if (!time24) return '--:-- --';
+        if (!time24) return '--:--';
         const [hours, minutes] = time24.split(':');
         const h = parseInt(hours);
         const period = h >= 12 ? 'م' : 'ص';
-        const hour12 = h % 12 || 12;
-        return `${hour12.toString().padStart(2, '0')}:${minutes} ${period}`;
-    }
-
-    function convert24To12(time24) {
-        if (!time24) return '';
-        const [hours, minutes] = time24.split(':');
-        const h = parseInt(hours);
-        const period = h >= 12 ? 'مساءً' : 'صباحاً';
         const hour12 = h % 12 || 12;
         return `${hour12}:${minutes} ${period}`;
     }
@@ -670,7 +500,7 @@
     // -------------------- اختيار الصيام --------------------
     function selectFasting(hours) {
         selectedFasting = hours;
-        document.querySelectorAll('.fasting-btn').forEach(el => {
+        document.querySelectorAll('.fasting-mini-btn').forEach(el => {
             el.classList.remove('selected');
             if (parseInt(el.dataset.hours) === hours) {
                 el.classList.add('selected');
@@ -692,96 +522,60 @@
         const breakfastHours = breakfastDate.getHours().toString().padStart(2, '0');
         const breakfastMinutes = breakfastDate.getMinutes().toString().padStart(2, '0');
         
-        const breakfastTime12 = formatTo12Hour(`${breakfastHours}:${breakfastMinutes}`);
-        document.getElementById('breakfastTime').innerText = breakfastTime12;
+        document.getElementById('breakfastTime').innerText = formatTo12Hour(`${breakfastHours}:${breakfastMinutes}`);
     }
-
-    // -------------------- إظهار/إخفاء الأدوية --------------------
-    document.getElementById('medsCheckbox').addEventListener('change', function(e) {
-        const details = document.getElementById('medsDetails');
-        details.style.display = e.target.checked ? 'block' : 'none';
-        if (e.target.checked) {
-            details.style.animation = 'slideIn 0.3s ease-out';
-        }
-    });
 
     // -------------------- حفظ البيانات --------------------
     function saveDailyData() {
         const date = document.getElementById('selectedDate').value;
         const lastMeal = document.getElementById('lastMealTime').value;
-        const breakfast = document.getElementById('breakfastTime').innerText;
         const weight = document.getElementById('weightInput').value;
         const belly = document.getElementById('bellyInput').value;
         const walk = document.getElementById('walkInput').value || 0;
         const plank = document.getElementById('plankInput').value || 0;
-        const water = document.getElementById('waterInput').value || 0;
-        const hasMeds = document.getElementById('medsCheckbox').checked;
-        const medsNames = document.getElementById('medsNames').value;
 
-        if (!lastMeal) {
-            alert('الرجاء إدخال وقت آخر وجبة');
+        if (!lastMeal || !weight || !belly) {
+            alert('الرجاء إدخال وقت آخر وجبة والوزن ومحيط البطن');
             return;
         }
 
         const data = {
             fasting: selectedFasting,
             lastMeal: lastMeal,
-            breakfast: breakfast,
-            weight: weight,
-            belly: belly,
+            weight: parseFloat(weight),
+            belly: parseFloat(belly),
             walk: parseInt(walk),
             plank: parseInt(plank),
-            water: parseInt(water),
-            hasMeds: hasMeds,
-            medsNames: hasMeds ? medsNames : '',
             timestamp: new Date().toISOString()
         };
 
-        // تأثير عند الحفظ
-        const btn = event.target;
-        btn.style.transform = 'scale(0.95)';
-        setTimeout(() => btn.style.transform = 'scale(1)', 200);
-
         db.ref('dailyRecords/' + date).set(data)
             .then(() => {
-                // مسح الحقول مع تأثير
+                // مسح الحقول
+                document.getElementById('lastMealTime').value = '';
+                document.getElementById('weightInput').value = '';
+                document.getElementById('bellyInput').value = '';
                 document.getElementById('walkInput').value = '';
                 document.getElementById('plankInput').value = '';
-                document.getElementById('waterInput').value = '';
-                document.getElementById('medsCheckbox').checked = false;
-                document.getElementById('medsDetails').style.display = 'none';
-                document.getElementById('medsNames').value = '';
+                document.getElementById('breakfastTime').innerText = '--:--';
                 
                 loadHistory();
-                
-                // رسالة نجاح
-                alert('✅ تم الحفظ بنجاح');
+                alert('✅ تم الحفظ');
             })
             .catch(error => {
                 console.error(error);
-                alert('❌ حدث خطأ في الحفظ');
+                alert('❌ خطأ في الحفظ');
             });
     }
 
-    // -------------------- تحميل السجل --------------------
+    // -------------------- تحميل السجل المصغر --------------------
     function loadHistory() {
         const historyList = document.getElementById('historyList');
-        historyList.innerHTML = `
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-                <p class="text-muted">جاري تحميل السجل...</p>
-            </div>
-        `;
         
-        db.ref('dailyRecords').orderByKey().once('value', (snapshot) => {
+        db.ref('dailyRecords').orderByKey().limitToLast(30).once('value', (snapshot) => {
             const records = snapshot.val();
             if (!records) {
-                historyList.innerHTML = `
-                    <div class="text-center py-5" data-aos="fade-up">
-                        <i class="fas fa-cloud-sun fa-4x text-muted mb-3" style="opacity: 0.3;"></i>
-                        <p class="text-muted">لا توجد بيانات بعد</p>
-                    </div>
-                `;
+                historyList.innerHTML = '<div class="text-center py-4 text-muted small">لا توجد بيانات</div>';
                 return;
             }
 
@@ -790,132 +584,92 @@
 
             let html = '';
             let prevWeight = null;
+            let prevBelly = null;
 
             entries.forEach((entry, index) => {
-                const weight = entry.weight ? parseFloat(entry.weight) : null;
-                const belly = entry.belly || '--';
-                const walk = entry.walk || 0;
-                const plank = entry.plank || 0;
-                const water = entry.water || 0;
+                const weight = entry.weight;
+                const belly = entry.belly;
                 
                 // حساب الفرق
-                let diffHtml = '';
-                if (weight && prevWeight !== null) {
-                    const diff = weight - prevWeight;
-                    if (Math.abs(diff) > 0.01) {
-                        if (diff > 0) {
-                            diffHtml = `<span style="color: #f56565; background: #fff5f5; padding: 2px 10px; border-radius: 50px; font-size: 0.85rem;">
-                                <i class="fas fa-arrow-up"></i> +${diff.toFixed(1)}
-                            </span>`;
-                        } else {
-                            diffHtml = `<span style="color: #48bb78; background: #f0fff4; padding: 2px 10px; border-radius: 50px; font-size: 0.85rem;">
-                                <i class="fas fa-arrow-down"></i> ${diff.toFixed(1)}
-                            </span>`;
-                        }
-                    }
+                let weightDiff = '';
+                let bellyDiff = '';
+                
+                if (prevWeight !== null) {
+                    const wDiff = weight - prevWeight;
+                    if (wDiff > 0) weightDiff = `<span class="diff-up">▲ +${wDiff.toFixed(1)}</span>`;
+                    else if (wDiff < 0) weightDiff = `<span class="diff-down">▼ ${wDiff.toFixed(1)}</span>`;
+                }
+                
+                if (prevBelly !== null) {
+                    const bDiff = belly - prevBelly;
+                    if (bDiff > 0) bellyDiff = `<span class="diff-up">▲ +${bDiff.toFixed(1)}</span>`;
+                    else if (bDiff < 0) bellyDiff = `<span class="diff-down">▼ ${bDiff.toFixed(1)}</span>`;
                 }
 
                 const dateObj = new Date(entry.date + 'T12:00:00');
-                const formattedDate = dateObj.toLocaleDateString('ar-EG', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
+                const day = dateObj.getDate();
+                const month = dateObj.toLocaleDateString('ar-EG', { month: 'short' });
 
                 html += `
-                    <div class="log-card" data-aos="fade-up" data-aos-delay="${index * 100}">
-                        <div class="log-header">
-                            <div class="log-date-badge">
-                                <i class="far fa-calendar-alt"></i>
-                                ${formattedDate}
-                                ${diffHtml}
-                            </div>
-                            <div class="log-actions">
-                                <div class="icon-btn edit" onclick="editDay('${entry.date}')">
-                                    <i class="fas fa-pen"></i>
-                                </div>
-                                <div class="icon-btn delete" onclick="deleteDay('${entry.date}')">
-                                    <i class="fas fa-trash"></i>
-                                </div>
-                            </div>
+                    <div class="mini-history-item">
+                        <div class="mini-date-box">
+                            <span class="mini-date-day">${day}</span>
+                            <span class="mini-date-month">${month}</span>
                         </div>
                         
-                        <div class="row g-2">
-                            <div class="col-6 col-md-4">
-                                <div style="background: #f7fafc; padding: 8px; border-radius: 15px; text-align: center;">
-                                    <i class="fas fa-weight-scale" style="color: #667eea;"></i>
-                                    <div class="small fw-bold">${weight ? weight + ' كجم' : '--'}</div>
-                                </div>
+                        <div class="mini-stats">
+                            <div class="mini-stat">
+                                <i class="fas fa-weight-scale"></i>
+                                <span>${weight} <small class="text-muted">كجم</small></span>
+                                ${weightDiff}
                             </div>
-                            <div class="col-6 col-md-4">
-                                <div style="background: #f7fafc; padding: 8px; border-radius: 15px; text-align: center;">
-                                    <i class="fas fa-utensils" style="color: #764ba2;"></i>
-                                    <div class="small fw-bold">${belly} سم</div>
-                                </div>
+                            <div class="mini-stat">
+                                <i class="fas fa-utensils"></i>
+                                <span>${belly} <small class="text-muted">سم</small></span>
+                                ${bellyDiff}
                             </div>
-                            <div class="col-4 col-md-2">
-                                <div style="background: #f7fafc; padding: 8px; border-radius: 15px; text-align: center;">
-                                    <i class="fas fa-person-walking" style="color: #48bb78;"></i>
-                                    <div class="small fw-bold">${walk}</div>
-                                </div>
+                            <div class="mini-stat">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>${entry.fasting || 16}</span>
                             </div>
-                            <div class="col-4 col-md-2">
-                                <div style="background: #f7fafc; padding: 8px; border-radius: 15px; text-align: center;">
-                                    <i class="fas fa-stopwatch" style="color: #ed64a6;"></i>
-                                    <div class="small fw-bold">${plank}</div>
-                                </div>
-                            </div>
-                            <div class="col-4 col-md-2">
-                                <div style="background: #f7fafc; padding: 8px; border-radius: 15px; text-align: center;">
-                                    <i class="fas fa-droplet" style="color: #4299e1;"></i>
-                                    <div class="small fw-bold">${water}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div>
-                                <span class="badge" style="background: linear-gradient(135deg, #9f7aea, #b794f4); color: white;">
-                                    <i class="fas fa-hourglass-half ms-1"></i> صيام ${entry.fasting}:8
-                                </span>
-                                <span class="badge bg-light text-dark ms-2">
-                                    <i class="far fa-clock ms-1"></i> آخر وجبة: ${entry.lastMeal ? formatTo12Hour(entry.lastMeal) : '--'}
-                                </span>
-                            </div>
-                            ${entry.hasMeds ? `
-                            <div class="meds-badge">
-                                <i class="fas fa-pills"></i> ${entry.medsNames || 'أدوية'}
+                            ${entry.walk ? `
+                            <div class="mini-stat">
+                                <i class="fas fa-person-walking"></i>
+                                <span>${entry.walk}</span>
                             </div>
                             ` : ''}
+                            ${entry.plank ? `
+                            <div class="mini-stat">
+                                <i class="fas fa-stopwatch"></i>
+                                <span>${entry.plank}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="mini-actions">
+                            <div class="mini-action-btn edit" onclick="editDay('${entry.date}')">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                            <div class="mini-action-btn delete" onclick="deleteDay('${entry.date}')">
+                                <i class="fas fa-trash"></i>
+                            </div>
                         </div>
                     </div>
                 `;
 
-                if (weight) prevWeight = weight;
+                prevWeight = weight;
+                prevBelly = belly;
             });
 
             historyList.innerHTML = html;
-            // تحديث AOS للعناصر الجديدة
-            AOS.refresh();
         });
     }
 
     // -------------------- حذف يوم --------------------
     function deleteDay(date) {
-        if (confirm('هل أنت متأكد من حذف هذا اليوم؟')) {
-            const logCard = document.getElementById(`log-${date}`);
-            if (logCard) {
-                logCard.style.animation = 'slideOut 0.3s ease-out forwards';
-            }
-            
+        if (confirm('حذف هذا اليوم؟')) {
             db.ref('dailyRecords/' + date).remove()
-                .then(() => {
-                    loadHistory();
-                })
-                .catch(error => {
-                    console.error(error);
-                    alert('حدث خطأ في الحذف');
-                });
+                .then(() => loadHistory());
         }
     }
 
@@ -937,17 +691,6 @@
             document.getElementById('bellyInput').value = data.belly || '';
             document.getElementById('walkInput').value = data.walk || '';
             document.getElementById('plankInput').value = data.plank || '';
-            document.getElementById('waterInput').value = data.water || '';
-            
-            if (data.hasMeds) {
-                document.getElementById('medsCheckbox').checked = true;
-                document.getElementById('medsDetails').style.display = 'block';
-                document.getElementById('medsNames').value = data.medsNames || '';
-            } else {
-                document.getElementById('medsCheckbox').checked = false;
-                document.getElementById('medsDetails').style.display = 'none';
-                document.getElementById('medsNames').value = '';
-            }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -965,7 +708,6 @@
     window.saveDailyData = saveDailyData;
     window.deleteDay = deleteDay;
     window.editDay = editDay;
-    window.formatTo12Hour = formatTo12Hour;
 
 </script>
 </body>
